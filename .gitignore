@@ -1,0 +1,7 @@
+build
+out
+.vs
+
+/build
+./build**
+/build-windows
