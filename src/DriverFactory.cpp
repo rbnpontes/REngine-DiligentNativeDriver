@@ -13,6 +13,7 @@
 
 
 #include "./SwapChain.h"
+#include "./StringDatabase.h"
 
 using namespace REngine;
 
@@ -79,38 +80,55 @@ void rengine_fill_vk_create_info(GraphicsDriverSettings* settings, Diligent::Eng
 	ci->DynamicHeapPageSize = settings->vulkan->dynamicHeapPageSize;
 }
 
-RENGINE Result* rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent) {
+RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent, Result* result, uint* length) {
 	using namespace Diligent;
 	Diligent::Version graphicsVersion;
 
-	Result* result = new Result();
+	rengine_stringdb_reset();
 
 #ifdef WIN32
 	if (backend == GraphicsBackend::D3D11 || backend == GraphicsBackend::D3D12)
 		graphicsVersion = Diligent::Version{ 11, 0 };
 #endif
-	
+
+	if (messageEvent == null) {
+		result->error = "Message Event Callback is Required.";
+		return;
+	}
+
 	IEngineFactory* factory = null;
+	DebugMessageCallbackType callback = static_cast<DebugMessageCallbackType>(messageEvent);
+
 	switch (backend)
 	{
 #ifdef WIN32
 	case GraphicsBackend::D3D11:
+	{
 		factory = GetEngineFactoryD3D11();
+		factory->SetMessageCallback(callback);
+	}
 		break;
 	case GraphicsBackend::D3D12:
 	{
 		auto d3d12Factory = GetEngineFactoryD3D12();
 		factory = d3d12Factory;
+		factory->SetMessageCallback(callback);
 
 		d3d12Factory->LoadD3D12();
 	}
 		break;
 #endif
 	case GraphicsBackend::Vulkan:
+	{
 		factory = GetEngineFactoryVk();
+		factory->SetMessageCallback(callback);
+	}
 		break;
 	case GraphicsBackend::OpenGL:
+	{
 		factory = GetEngineFactoryOpenGL();
+		factory->SetMessageCallback(callback);
+	}
 		break;
 	default:
 		result->error = "Not supported this backend type.";
@@ -118,9 +136,7 @@ RENGINE Result* rengine_get_available_adapter(GraphicsBackend backend, void* mes
 	}
 
 	if (!factory)
-		return result;
-
-	factory->SetMessageCallback(static_cast<DebugMessageCallbackType>(messageEvent));
+		return;
 
 	uint adaptersCount = 0;
 	std::vector<GraphicsAdapterInfo> adapters;
@@ -135,11 +151,11 @@ RENGINE Result* rengine_get_available_adapter(GraphicsBackend backend, void* mes
 		finalAdapters[i].id = adapters[i].DeviceId;
 		finalAdapters[i].adapterType = (AdapterType)adapters[i].Type;
 		finalAdapters[i].vendorId = adapters[i].VendorId;
-		finalAdapters[i].name = adapters[i].Description;
+		finalAdapters[i].name = rengine_stringdb_store(adapters[i].Description);
 	}
 
 	result->value = finalAdapters;
-	return result;
+	*length = adaptersCount;
 }
 
 RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDesc* desc, Diligent::NativeWindow* nativeWnd) 
@@ -272,10 +288,10 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	}
 	}
 
-	factory->Release();
 
 	result->driver = new GraphicsDriver();
 	result->driver->device = renderDevice;
+	result->driver->factory = factory;
 
 	if (settings->backend == GraphicsBackend::OpenGL) {
 		result->driver->deferredCtx = null;
@@ -285,16 +301,7 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	}
 	else {
 		result->driver->immediateCtx = deviceContexts[0];
-		if (settings->numDeferredCtx > 0) {
-			result->driver->deferredCtx = new IDeviceContext*[settings->numDeferredCtx];
-		for (int i = 0; i < settings->numDeferredCtx; ++i)
-			result->driver->deferredCtx[i] = deviceContexts[i + 1];
-		}
-		else {
-			result->driver->deferredCtx = null;
-		}
-		
-		delete deviceContexts;
+		result->driver->deferredCtx = sizeof(IDeviceContext) + deviceContexts;
 	}
 
 	return result;

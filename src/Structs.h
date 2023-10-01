@@ -100,6 +100,7 @@ namespace REngine
 		Diligent::IRenderDevice* device;
 		Diligent::IDeviceContext* immediateCtx;
 		Diligent::IDeviceContext** deferredCtx;
+		Diligent::IEngineFactory* factory;
 	};
 
 	struct GraphicsDriverResult {
