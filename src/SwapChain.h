@@ -2,4 +2,9 @@
 
 #include "Structs.h"
 
-void rengine_fill_swapchain_desc(REngine::SwapChainDesc* desc, Diligent::SwapChainDesc* output);
+void rengine_swapchain_fill_desc(REngine::SwapChainDesc* desc, Diligent::SwapChainDesc* output);
+RENGINE void rengine_swapchain_get_desc(Diligent::ISwapChain* swapChain, REngine::SwapChainDesc* output);
+RENGINE void rengine_swapchain_present(Diligent::ISwapChain* swapChain, uint sync);
+RENGINE void rengine_swapchain_resize(Diligent::ISwapChain* swapChain, uint width, uint height, uint transform);
+RENGINE Diligent::ITextureView* rengine_swapchain_get_backbuffer(Diligent::ISwapChain* swapChain);
+RENGINE Diligent::ITextureView* rengine_swapchain_get_depthbuffer(Diligent::ISwapChain* swapChain);

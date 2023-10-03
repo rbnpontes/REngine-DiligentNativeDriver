@@ -80,6 +80,21 @@ void rengine_fill_vk_create_info(GraphicsDriverSettings* settings, Diligent::Eng
 	ci->DynamicHeapPageSize = settings->vulkan->dynamicHeapPageSize;
 }
 
+bool rengine_is_valid_window(Diligent::NativeWindow* window) {
+#ifdef PLATFORM_WIN32
+	return window->hWnd != null;
+#elif PLATFORM_UNIVERSAL_WINDOWS
+	return window->pCoreWindow != null;
+#elif PLATFORM_ANDROID
+	return window->pAWindow != null;
+#elif PLATFORM_LINUX
+	return window->WindowId != 0 || window->pDisplay != null || window->pXCBConnection != null;
+#elif PLATFORM_MACOS
+	return window->pNSView != null;
+#endif
+	return false;
+}
+
 RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent, Result* result, uint* length) {
 	using namespace Diligent;
 	Diligent::Version graphicsVersion;
@@ -147,8 +162,9 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	factory->Release();
 
 	GraphicsAdapter* finalAdapters = new GraphicsAdapter[adaptersCount];
-	for (int i = 0; i < adaptersCount; ++i) {
-		finalAdapters[i].id = adapters[i].DeviceId;
+	for (uint i = 0; i < adaptersCount; ++i) {
+		finalAdapters[i].id = i;
+		finalAdapters[i].deviceId = adapters[i].DeviceId;
 		finalAdapters[i].adapterType = (AdapterType)adapters[i].Type;
 		finalAdapters[i].vendorId = adapters[i].VendorId;
 		finalAdapters[i].name = rengine_stringdb_store(adapters[i].Description);
@@ -158,15 +174,38 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	*length = adaptersCount;
 }
 
-RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDesc* desc, Diligent::NativeWindow* nativeWnd) 
+RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDesc* desc, Diligent::NativeWindow* nativeWnd, GraphicsDriverResult* result) 
 {
 	using namespace Diligent;
-	GraphicsDriverResult* result = new GraphicsDriverResult();
+
+	if (!settings) {
+		result->error = "Driver Settings is required";
+		return;
+	}
+
+	if (!settings->messageCallback) {
+		result->error = "Message Event Callback is required";
+		return;
+	}
+
+	if (desc && nativeWnd == null) {
+		result->error = "Native Window is required when SwapChainDesc is present.";
+		return;
+	}
+
+	if (desc && nativeWnd) {
+		if (!rengine_is_valid_window(nativeWnd)) {
+			result->error = "Native Window is Required when SwapChainDesc is present.";
+			return;
+		}
+	}
 
 	IRenderDevice* renderDevice = null;
-	IDeviceContext** deviceContexts = null;
+	IDeviceContext** deviceContexts = new IDeviceContext*[settings->numDeferredCtx + 1];
 
 	IEngineFactory* factory = null;
+
+	DebugMessageCallbackType callback = static_cast<DebugMessageCallbackType>(settings->messageCallback);
 
 	switch (settings->backend)
 	{
@@ -175,18 +214,17 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	{
 		EngineD3D11CreateInfo ci;
 		rengine_fill_create_info(settings, &ci);
-
-		ci.EnableValidation = settings->enableValidation;
-		ci.AdapterId = settings->adapterId;
-		ci.NumDeferredContexts = settings->numDeferredCtx;
+		ci.GraphicsAPIVersion = { 11, 0 };
+		if (ci.EnableValidation)
+			ci.SetValidationLevel(VALIDATION_LEVEL_2);
 
 		IEngineFactoryD3D11* engineFactory = GetEngineFactoryD3D11();
-		engineFactory->SetMessageCallback(static_cast<DebugMessageCallbackType>(settings->messageCallback));
+		engineFactory->SetMessageCallback(callback);
 		
 		engineFactory->CreateDeviceAndContextsD3D11(ci, &renderDevice, deviceContexts);
 		if (desc) {
 			Diligent::SwapChainDesc swapChainDesc;
-			rengine_fill_swapchain_desc(desc, &swapChainDesc);
+			rengine_swapchain_fill_desc(desc, &swapChainDesc);
 
 			engineFactory->CreateSwapChainD3D11(
 				renderDevice,
@@ -205,16 +243,17 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	{
 		EngineD3D12CreateInfo ci;
 		rengine_fill_d3d12_create_info(settings, &ci);
+		ci.GraphicsAPIVersion = { 11, 0 };
 
 		IEngineFactoryD3D12* engineFactory = GetEngineFactoryD3D12();
-		engineFactory->SetMessageCallback(static_cast<DebugMessageCallbackType>(settings->messageCallback));
+		engineFactory->SetMessageCallback(callback);
 		engineFactory->LoadD3D12();
 
 		engineFactory->CreateDeviceAndContextsD3D12(ci, &renderDevice, deviceContexts);
 
 		if (desc) {
 			Diligent::SwapChainDesc swapChainDesc;
-			rengine_fill_swapchain_desc(desc, &swapChainDesc);
+			rengine_swapchain_fill_desc(desc, &swapChainDesc);
 
 			engineFactory->CreateSwapChainD3D12(
 				renderDevice,
@@ -235,13 +274,22 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 		EngineVkCreateInfo ci;
 		rengine_fill_vk_create_info(settings, &ci);
 
+		const char* const ppIgnoreDebugMessages[] = //
+			{
+				// Validation Performance Warning: [ UNASSIGNED-CoreValidation-Shader-OutputNotConsumed ]
+				// vertex shader writes to output location 1.0 which is not consumed by fragment shader
+				"UNASSIGNED-CoreValidation-Shader-OutputNotConsumed" //
+			};
+		ci.ppIgnoreDebugMessageNames = ppIgnoreDebugMessages;
+		ci.IgnoreDebugMessageCount   = _countof(ppIgnoreDebugMessages);
+
 		IEngineFactoryVk* engineFactory = GetEngineFactoryVk();
-		engineFactory->SetMessageCallback(static_cast<DebugMessageCallbackType>(settings->messageCallback));
+		engineFactory->SetMessageCallback(callback);
 	
 		engineFactory->CreateDeviceAndContextsVk(ci, &renderDevice, deviceContexts);
 		if (desc) {
 			Diligent::SwapChainDesc swapChainDesc;
-			rengine_fill_swapchain_desc(desc, &swapChainDesc);
+			rengine_swapchain_fill_desc(desc, &swapChainDesc);
 
 			engineFactory->CreateSwapChainVk(
 				renderDevice,
@@ -257,25 +305,27 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	{
 		if (!desc) {
 			result->error = "SwapChain Description is required when Graphics Backend is OpenGL";
-			return result;
+			delete[] deviceContexts;
+			return;
 		}
 
 		Diligent::SwapChainDesc swapChainDesc;
-		rengine_fill_swapchain_desc(desc, &swapChainDesc);
+		rengine_swapchain_fill_desc(desc, &swapChainDesc);
 
 		EngineGLCreateInfo ci;
 		rengine_fill_create_info(settings, &ci);
+		ci.NumDeferredContexts = 0; // Deferred Context on OpenGL is not supported
+		ci.Window = *nativeWnd;
 
 		IDeviceContext* immediateCtx;
 		IEngineFactoryOpenGL* engineFactory = GetEngineFactoryOpenGL();
-		engineFactory->SetMessageCallback(static_cast<DebugMessageCallbackType>(settings->messageCallback));
+		engineFactory->SetMessageCallback(callback);
 
 		engineFactory->CreateDeviceAndSwapChainGL(
 			ci, 
 			&renderDevice, 
 			&immediateCtx, swapChainDesc, &result->swapChain);
 
-		deviceContexts = new IDeviceContext*[1];
 		deviceContexts[0] = immediateCtx;
 
 		factory = engineFactory;
@@ -284,7 +334,7 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	default:
 	{
 		result->error = "Not supported this backend type.";
-		return result;
+		return;
 	}
 	}
 
@@ -292,17 +342,82 @@ RENGINE GraphicsDriverResult* rengine_create_driver(GraphicsDriverSettings* sett
 	result->driver = new GraphicsDriver();
 	result->driver->device = renderDevice;
 	result->driver->factory = factory;
+	result->driver->contexts = deviceContexts;
+}
 
-	if (settings->backend == GraphicsBackend::OpenGL) {
-		result->driver->deferredCtx = null;
-		result->driver->immediateCtx = deviceContexts[0];
-
-		delete deviceContexts;
-	}
-	else {
-		result->driver->immediateCtx = deviceContexts[0];
-		result->driver->deferredCtx = sizeof(IDeviceContext) + deviceContexts;
+RENGINE void rengine_create_swapchain(SwapChainCreationInfo* creationInfo, Result* result)
+{
+	if (!creationInfo->device) {
+		result->error = "Device is Required.";
+		return;
 	}
 
-	return result;
+	if (!creationInfo->deviceContext) {
+		result->error = "DeviceContext aka .NET(ICommandBuffer) is required.";
+		return;
+	}
+
+	if (!creationInfo->factory) {
+		result->error = "EngineFactory is required.";
+	}
+
+	if (!creationInfo->swapChainDesc) {
+		result->error = "SwapChain Description is Required.";
+		return;
+	}
+
+	if (!creationInfo->window) {
+		result->error = "Window is required. How do you think you will create a SwapChain ?";
+		return;
+	}
+
+	Diligent::ISwapChain* swapChain = null;
+	Diligent::SwapChainDesc swapChainDesc;
+	rengine_swapchain_fill_desc(creationInfo->swapChainDesc, &swapChainDesc);
+	
+	switch (creationInfo->backend)
+	{
+#ifdef WIN32
+	case GraphicsBackend::D3D11:
+	{
+		static_cast<Diligent::IEngineFactoryD3D11*>(creationInfo->factory)->CreateSwapChainD3D11(
+			creationInfo->device,
+			creationInfo->deviceContext,
+			swapChainDesc,
+			Diligent::FullScreenModeDesc {},
+			*creationInfo->window,
+			&swapChain
+		);
+	}
+		break;
+	case GraphicsBackend::D3D12:
+	{
+		static_cast<Diligent::IEngineFactoryD3D12*>(creationInfo->factory)->CreateSwapChainD3D12(
+			creationInfo->device,
+			creationInfo->deviceContext,
+			swapChainDesc,
+			Diligent::FullScreenModeDesc {},
+			*creationInfo->window,
+			&swapChain
+		);
+	}
+		break;
+#endif
+	case GraphicsBackend::Vulkan:
+	{
+		static_cast<Diligent::IEngineFactoryVk*>(creationInfo->factory)->CreateSwapChainVk(
+			creationInfo->device,
+			creationInfo->deviceContext,
+			swapChainDesc,
+			*creationInfo->window,
+			&swapChain
+		);
+	}
+		break;
+	case GraphicsBackend::OpenGL:
+		result->error = "Not supported SwapChain creation on OpenGL backend.";
+		break;
+	}
+
+	result->value = swapChain;
 }

@@ -78,6 +78,11 @@ public:
         return m_NumWeakReferences.load();
     }
 
+    virtual void SetReleaseCallback(ObjectReleaseCallbackType callback) override final 
+    {
+
+    }
+
 private:
     ObjectType&                            m_Object;
     std::atomic<ReferenceCounterValueType> m_NumStrongReferences{0};

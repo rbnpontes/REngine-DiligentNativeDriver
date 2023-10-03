@@ -3,6 +3,7 @@
 #include "Api.h"
 #include "DeviceContext.h"
 #include "RenderDevice.h"
+#include "EngineFactory.h"
 
 namespace REngine
 {
@@ -92,14 +93,14 @@ namespace REngine
 	struct GraphicsAdapter {
 		uint id;
 		uint vendorId;
+		uint deviceId;
 		string* name;
 		AdapterType adapterType;
 	};
 
 	struct GraphicsDriver {
 		Diligent::IRenderDevice* device;
-		Diligent::IDeviceContext* immediateCtx;
-		Diligent::IDeviceContext** deferredCtx;
+		Diligent::IDeviceContext** contexts;
 		Diligent::IEngineFactory* factory;
 	};
 
@@ -118,15 +119,24 @@ namespace REngine
 		uint width;
 		uint height;
 
-		byte colorFormat;
-		byte depthFormat;
+		ushort colorFormat;
+		ushort depthFormat;
 
-		byte usage;
-		byte transform;
+		uint usage;
+		uint transform;
 
 		uint bufferCount;
 		float defaultDepthValue;
 		byte defaultStencilValue;
 		boolean isPrimary;
+	};
+
+	struct SwapChainCreationInfo {
+		GraphicsBackend backend;
+		Diligent::IEngineFactory* factory;
+		Diligent::IRenderDevice* device;
+		Diligent::IDeviceContext* deviceContext;
+		SwapChainDesc* swapChainDesc;
+		Diligent::NativeWindow* window;
 	};
 }

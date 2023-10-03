@@ -215,6 +215,11 @@ public:
         return m_NumWeakReferences.load();
     }
 
+    inline virtual void SetReleaseCallback(ObjectReleaseCallbackType callback) override final
+    {
+        m_ReleaseCallback = callback;
+    }
+
 private:
     template <typename AllocatorType, typename ObjectType>
     friend class MakeNewRCObj;
@@ -374,6 +379,11 @@ private:
         if (m_NumStrongReferences.load() == 0 && m_ObjectState.load() == ObjectState::Alive)
         {
             VERIFY(m_ObjectWrapperBuffer[0] != 0 && m_ObjectWrapperBuffer[1] != 0, "Object wrapper is not initialized");
+
+            if (m_ReleaseCallback)
+                m_ReleaseCallback(this);
+            m_ReleaseCallback = nullptr;
+
             // We cannot destroy the object while reference counters are locked as this will
             // cause a deadlock in cases like this:
             //
@@ -490,6 +500,8 @@ private:
         Destroyed
     };
     std::atomic<ObjectState> m_ObjectState{ObjectState::NotInitialized};
+
+    ObjectReleaseCallbackType m_ReleaseCallback{nullptr};
 };
 
 

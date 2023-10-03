@@ -1,6 +1,6 @@
 #include "./SwapChain.h"
 
-void rengine_fill_swapchain_desc(REngine::SwapChainDesc* desc, Diligent::SwapChainDesc* output)
+void rengine_swapchain_fill_desc(REngine::SwapChainDesc* desc, Diligent::SwapChainDesc* output)
 {
 	output->Width = desc->width;
 	output->Height = desc->height;
@@ -15,4 +15,48 @@ void rengine_fill_swapchain_desc(REngine::SwapChainDesc* desc, Diligent::SwapCha
 	output->DefaultDepthValue = desc->defaultDepthValue;
 	output->DefaultStencilValue = desc->defaultStencilValue;
 	output->IsPrimary = desc->isPrimary;
+}
+
+RENGINE void rengine_swapchain_get_desc(Diligent::ISwapChain* swapChain, REngine::SwapChainDesc* output) 
+{
+	Diligent::SwapChainDesc desc = swapChain->GetDesc();
+	output->width = desc.Width;
+	output->height = desc.Height;
+
+	output->colorFormat = desc.ColorBufferFormat;
+	output->depthFormat = desc.DepthBufferFormat;
+
+	output->usage = desc.Usage;
+	output->transform = desc.PreTransform;
+
+	output->bufferCount = desc.BufferCount;
+	output->defaultDepthValue = desc.DefaultDepthValue;
+	output->defaultStencilValue = desc.DefaultStencilValue;
+	output->isPrimary = desc.IsPrimary ? 1 : 0;
+}
+
+RENGINE void rengine_swapchain_present(Diligent::ISwapChain* swapChain, uint sync) 
+{
+	if(swapChain)
+		swapChain->Present(sync);
+}
+
+RENGINE void rengine_swapchain_resize(Diligent::ISwapChain* swapChain, uint width, uint height, uint transform)
+{
+	if (swapChain)
+		swapChain->Resize(width, height, (Diligent::SURFACE_TRANSFORM)transform);
+}
+
+RENGINE Diligent::ITextureView* rengine_swapchain_get_backbuffer(Diligent::ISwapChain* swapChain)
+{
+	if (swapChain)
+		return swapChain->GetCurrentBackBufferRTV();
+	return null;
+}
+
+RENGINE Diligent::ITextureView* rengine_swapchain_get_depthbuffer(Diligent::ISwapChain* swapChain) 
+{
+	if (swapChain)
+		return swapChain->GetDepthBufferDSV();
+	return null;
 }

@@ -35,6 +35,7 @@
 DILIGENT_BEGIN_NAMESPACE(Diligent)
 
 typedef Int32 ReferenceCounterValueType;
+typedef void(DILIGENT_CALL_TYPE* ObjectReleaseCallbackType)(void* object);
 
 #if DILIGENT_CPP_INTERFACE
 
@@ -116,6 +117,13 @@ public:
     /// \note   In a multithreaded environment, the returned number may not be reliable
     ///         as other threads may simultaneously change the actual value of the counter.
     virtual ReferenceCounterValueType GetNumWeakRefs() const = 0;
+
+    /// Set callback to release, when objects goes to be destroyed this function pointer will be executed.
+    
+    /// \param [in] callback - Function pointer that will be executed
+    ///
+    /// \remark This function pointer will be only executed if all refs goes to zero
+    virtual void SetReleaseCallback(ObjectReleaseCallbackType callback) = 0;
 };
 
 #else
