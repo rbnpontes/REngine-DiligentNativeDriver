@@ -233,7 +233,7 @@ void EngineFactoryOpenGLImpl::CreateDeviceAndSwapChainGL(const EngineGLCreateInf
 
         pDeviceContextOpenGL->SetSwapChain(pSwapChainGL);
     }
-    catch (const std::runtime_error&)
+    catch (const std::runtime_error& e)
     {
         if (*ppDevice)
         {
@@ -253,7 +253,7 @@ void EngineFactoryOpenGLImpl::CreateDeviceAndSwapChainGL(const EngineGLCreateInf
             *ppSwapChain = nullptr;
         }
 
-        LOG_ERROR("Failed to initialize OpenGL-based render device");
+        LOG_ERROR("Failed to initialize OpenGL-based render device. Error: ", e.what());
     }
 }
 

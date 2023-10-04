@@ -116,7 +116,7 @@ GLContext::GLContext(const EngineGLCreateInfo& InitAttribs,
 
         BOOL bResult = SetPixelFormat(m_WindowHandleToDeviceContext, nPixelFormat, &pfd);
         if (!bResult)
-            LOG_ERROR_AND_THROW("Failed to set Pixel Format");
+            LOG_ERROR_AND_THROW("Failed to set Pixel Format. Error: ", PlatformMisc::GetLastErrorMessage());
 
         // Create standard OpenGL (2.1) rendering context which will be used only temporarily,
         HGLRC tempContext = wglCreateContext(m_WindowHandleToDeviceContext);
@@ -157,11 +157,15 @@ GLContext::GLContext(const EngineGLCreateInfo& InitAttribs,
                 // The only way is to create an old context, activate it, and while it is active create a new one.
                 // Very inconsistent, but we have to live with it!
                 m_Context = wglCreateContextAttribsARB(m_WindowHandleToDeviceContext, 0, attribs);
+                if (m_Context == NULL)
+                {
+                    LOG_WARNING_MESSAGE(PlatformMisc::GetLastErrorMessage());
+                }
             }
 
             if (m_Context == NULL)
             {
-                LOG_ERROR_AND_THROW("Failed to initialize OpenGL context.");
+                LOG_ERROR_AND_THROW("Failed to initialize OpenGL context. Error:", PlatformMisc::GetLastErrorMessage());
             }
 
             // Delete tempContext

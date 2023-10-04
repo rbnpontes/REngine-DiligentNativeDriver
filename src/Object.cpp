@@ -8,3 +8,10 @@ RENGINE void rengine_object_set_release_callback(Diligent::IObject* object, Dili
 	if (object != null)
 		object->GetReferenceCounters()->SetReleaseCallback(releaseCallback);
 }
+
+RENGINE string* rengine_object_getname(Diligent::IDeviceObject* object)
+{
+	if (object != null)
+		return object->GetDesc().Name;
+	return null;
+}

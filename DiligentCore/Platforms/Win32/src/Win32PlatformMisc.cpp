@@ -28,7 +28,10 @@
 
 #include "WinHPreface.h"
 #include <Windows.h>
+#include <comdef.h>
+#include <iomanip>
 #include "WinHPostface.h"
+
 
 namespace Diligent
 {
@@ -86,6 +89,22 @@ ThreadPriority WindowsMisc::SetCurrentThreadPriority(ThreadPriority Priority)
         return WndPriorityToThreadPiority(OrigWndPriority);
     else
         return ThreadPriority::Unknown;
+}
+
+std::string WindowsMisc::GetLastErrorMessage() {
+    DWORD lastError = GetLastError();
+    _com_error error(lastError);
+    const TCHAR* val = error.ErrorMessage();
+
+    if (val != NULL) {
+        return std::string(val);
+    }
+
+    std::stringstream stream;
+    stream << "0x" 
+            << std::setfill ('0') << std::setw(sizeof(DWORD)*2) 
+            << std::hex << lastError;
+    return stream.str();
 }
 
 } // namespace Diligent

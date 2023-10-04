@@ -172,6 +172,8 @@ struct WindowsMisc : public BasicPlatformMisc
     /// Sets the current thread priority and on success returns the previous priority.
     /// On failure, returns ThreadPriority::Unknown.
     static ThreadPriority SetCurrentThreadPriority(ThreadPriority Priority);
+
+    static std::string GetLastErrorMessage();
 };
 
 } // namespace Diligent
