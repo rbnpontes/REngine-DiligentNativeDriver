@@ -21,7 +21,7 @@ RENGINE void rengine_cmdbuffer_commitbindings(
 );
 RENGINE void rengine_cmdbuffer_copy_tex(
 	Diligent::IDeviceContext* context,
-	REngine::CopyTextureInfo* copyInfo,
+	REngine::CopyTextureInfoDTO* copyInfo,
 	byte isDeferred
 );
 RENGINE void rengine_cmdbuffer_draw(

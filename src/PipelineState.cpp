@@ -306,8 +306,6 @@ void rengine_pipelinestate_fill(
 			? SAMPLER_DEFAULT_TEX_ANISOTROPY
 			: samplers[i].sampler_anisotropy;
 		immutableSamplers[i].Desc.ComparisonFunc = Diligent::COMPARISON_FUNC_EQUAL;
-		immutableSamplers[i].Desc.MinLOD = 0;
-		immutableSamplers[i].Desc.MaxLOD = UINT32_MAX;
 	}
 }
 

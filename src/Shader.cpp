@@ -16,6 +16,7 @@ void rengine_shader_fill(REngine::ShaderCreateInfoDTO* ci, Diligent::ShaderCreat
 
 	output->Desc.Name = ci->name;
 	output->Desc.ShaderType = s_shaderTypes[(byte)ci->type];
+	output->Desc.UseCombinedTextureSamplers = true;
 	output->ByteCode = ci->byteCode;
 	output->ByteCodeSize = ci->byteCodeLength;
 	output->Source = ci->sourceCode;

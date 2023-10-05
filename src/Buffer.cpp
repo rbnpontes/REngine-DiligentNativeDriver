@@ -5,6 +5,7 @@ void rengine_buffer_fill(REngine::BufferDescDTO* desc, Diligent::BufferDesc* out
 {
 	output->Name = desc->name;
 	output->Size = desc->size;
+	output->Usage = desc->usage;
 	output->BindFlags = desc->bindFlags;
 	output->CPUAccessFlags = desc->accessFlags;
 	output->Mode = desc->mode;
@@ -19,4 +20,5 @@ RENGINE void rengine_buffer_getdesc(Diligent::IBuffer* buffer, REngine::BufferDe
 	output->accessFlags = desc.CPUAccessFlags;
 	output->mode = desc.Mode;
 	output->elementByteStride = desc.ElementByteStride;
+	output->usage = desc.Usage;
 }

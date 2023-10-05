@@ -140,7 +140,7 @@ namespace REngine
 		Diligent::NativeWindow* window;
 	};
 
-	struct CopyTextureInfo {
+	struct CopyTextureInfoDTO {
 		Diligent::ITexture* srcTexture;
 		uint srcMipLevel;
 		uint srcSlice;
