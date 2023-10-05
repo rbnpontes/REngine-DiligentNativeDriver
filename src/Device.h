@@ -10,12 +10,12 @@ RENGINE void rengine_device_create_buffer(
 );
 RENGINE void rengine_device_create_shader(
 	Diligent::IRenderDevice* device,
-	REngine::ShaderCreateInfo* createInfo,
+	REngine::ShaderCreateInfoDTO* createInfo,
 	REngine::Result* result
 );
 RENGINE void rengine_device_create_graphicspipeline(
 	Diligent::IRenderDevice* device,
-	REngine::GraphicsPipelineDesc* desc,
+	REngine::GraphicsPipelineDescDTO* desc,
 	byte isOpenGl,
 	REngine::Result* result
 );
@@ -27,8 +27,8 @@ RENGINE void rengine_device_create_computepipeline(
 );
 RENGINE void rengine_device_create_texture(
 	Diligent::IRenderDevice* device,
-	REngine::TextureDesc* desc,
-	REngine::TextureData* data,
+	REngine::TextureDescDTO* desc,
+	REngine::TextureDataDTO* data,
 	uint numTexData,
 	REngine::Result* result
 );

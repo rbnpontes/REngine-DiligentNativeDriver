@@ -10,7 +10,7 @@ static Diligent::SHADER_TYPE s_shaderTypes[] = {
 	Diligent::SHADER_TYPE_DOMAIN,
 };
 
-void rengine_shader_fill(REngine::ShaderCreateInfo* ci, Diligent::ShaderCreateInfo* output, std::vector<Diligent::ShaderMacro>& macros) {
+void rengine_shader_fill(REngine::ShaderCreateInfoDTO* ci, Diligent::ShaderCreateInfo* output, std::vector<Diligent::ShaderMacro>& macros) {
 	
 	macros.resize(ci->numMacros);
 

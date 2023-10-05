@@ -1,6 +1,6 @@
 #include "./Texture.h"
 
-void rengine_texture_fill(REngine::TextureDesc* desc, Diligent::TextureDesc* output)
+void rengine_texture_fill(REngine::TextureDescDTO* desc, Diligent::TextureDesc* output)
 {
 	output->Name = desc->name;
 	output->Type = desc->dimension;
@@ -25,7 +25,7 @@ void rengine_texture_fill(REngine::TextureDesc* desc, Diligent::TextureDesc* out
 }
 
 void rengine_texture_fill(
-	REngine::TextureData* data,
+	REngine::TextureDataDTO* data,
 	uint numTexData,
 	std::vector<Diligent::TextureSubResData> subresources,
 	Diligent::TextureData* output
@@ -46,7 +46,7 @@ void rengine_texture_fill(
 
 RENGINE void rengine_texture_getdesc(
 	Diligent::ITexture* texture,
-	REngine::TextureDesc* output
+	REngine::TextureDescDTO* output
 )
 {
 	if (!texture || !output)

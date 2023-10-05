@@ -2,7 +2,7 @@
 #include "./Structs.h"
 #include <vector>
 
-void rengine_shader_fill(REngine::ShaderCreateInfo* ci, Diligent::ShaderCreateInfo* output, std::vector<Diligent::ShaderMacro>& macros);
+void rengine_shader_fill(REngine::ShaderCreateInfoDTO* ci, Diligent::ShaderCreateInfo* output, std::vector<Diligent::ShaderMacro>& macros);
 
 Diligent::SHADER_TYPE rengine_shader_convert_shader_flags(REngine::ShaderTypeFlags flags);
 

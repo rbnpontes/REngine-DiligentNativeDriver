@@ -183,7 +183,7 @@ namespace REngine
 		Domain = 1 << 5
 	};
 
-	struct ShaderCreateInfo {
+	struct ShaderCreateInfoDTO {
 		string* name;
 		ShaderType type;
 		string* sourceCode;
@@ -237,7 +237,7 @@ namespace REngine
 		TextureAddressMode sampler_addressMode_w;
 	};
 
-	struct GraphicsPipelineDesc {
+	struct GraphicsPipelineDescDTO {
 		string* name;
 
 		byte blendState_colorWriteEnabled;
@@ -291,7 +291,7 @@ namespace REngine
 		Diligent::IShader* shader;
 	};
 
-	struct TextureDesc {
+	struct TextureDescDTO {
 		string* name;
 		Diligent::RESOURCE_DIMENSION dimension;
 		uint width;
@@ -327,7 +327,7 @@ namespace REngine
 		byte allowMipMapGeneration;
 	};
 
-	struct TextureData {
+	struct TextureDataDTO {
 		void* data;
 		Diligent::IBuffer* srcBuffer;
 		ulong srcOffset;

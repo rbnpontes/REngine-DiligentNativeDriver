@@ -12,6 +12,7 @@ RENGINE void rengine_device_create_buffer(
 	REngine::Result* result
 )
 {
+#ifdef RENGINE_DEBUG
 	if (!device)
 	{
 		result->error = "Device is required";
@@ -22,6 +23,7 @@ RENGINE void rengine_device_create_buffer(
 		result->error = "Buffer Description is required";
 		return;
 	}
+#endif
 
 	Diligent::BufferDesc bufferDesc;
 	rengine_buffer_fill(desc, &bufferDesc);
@@ -34,16 +36,19 @@ RENGINE void rengine_device_create_buffer(
 	device->CreateBuffer(bufferDesc, data != null ? &bufferData : null, &buffer);
 
 	result->value = buffer;
+#ifdef RENGINE_DEBUG
 	if (!buffer)
 		result->error = "Could not possible to create IBuffer";
+#endif
 }
 
 RENGINE void rengine_device_create_shader(
 	Diligent::IRenderDevice* device,
-	REngine::ShaderCreateInfo* createInfo,
+	REngine::ShaderCreateInfoDTO* createInfo,
 	REngine::Result* result
 )
 {
+#ifdef RENGINE_DEBUG
 	if (!device) 
 	{
 		result->error = "Device is required";
@@ -54,6 +59,7 @@ RENGINE void rengine_device_create_shader(
 		result->error = "Buffer Description is required";
 		return;
 	}
+#endif
 
 	Diligent::ShaderCreateInfo ci;
 	std::vector<Diligent::ShaderMacro> macros;
@@ -63,17 +69,20 @@ RENGINE void rengine_device_create_shader(
 	device->CreateShader(ci, &shader);
 
 	result->value = shader;
+#ifdef RENGINE_DEBUG
 	if (!shader)
 		result->error = "Could not possible to create IShader";
+#endif
 }
 
 RENGINE void rengine_device_create_graphicspipeline(
 	Diligent::IRenderDevice* device,
-	REngine::GraphicsPipelineDesc* desc,
+	REngine::GraphicsPipelineDescDTO* desc,
 	byte isOpenGl,
 	REngine::Result* result
 )
 {
+#ifdef RENGINE_DEBUG
 	if (!device) {
 		result->error = "Device is required";
 		return;
@@ -89,6 +98,7 @@ RENGINE void rengine_device_create_graphicspipeline(
 		result->error = "Pixel Shader and Vertex Shader is required";
 		return;
 	}
+#endif
 
 	Diligent::IPipelineState* pipeline = null;
 	Diligent::GraphicsPipelineStateCreateInfo ci;
@@ -99,8 +109,10 @@ RENGINE void rengine_device_create_graphicspipeline(
 	device->CreateGraphicsPipelineState(ci, &pipeline);
 
 	result->value = pipeline;
+#ifdef RENGINE_DEBUG
 	if (!pipeline)
 		result->error = "Could not possible to create graphics IPipelineState";
+#endif
 }
 
 RENGINE void rengine_device_create_computepipeline(
@@ -110,6 +122,7 @@ RENGINE void rengine_device_create_computepipeline(
 	REngine::Result* result
 )
 {
+#ifdef RENGINE_DEBUG
 	if (!device) {
 		result->error = "Device is required";
 		return;
@@ -125,7 +138,7 @@ RENGINE void rengine_device_create_computepipeline(
 		result->error = "Compute Shader is required";
 		return;
 	}
-
+#endif
 	Diligent::IPipelineState* pipeline = null;
 	Diligent::ComputePipelineStateCreateInfo ci;
 	std::vector<Diligent::ImmutableSamplerDesc> samplers;
@@ -134,18 +147,21 @@ RENGINE void rengine_device_create_computepipeline(
 	device->CreateComputePipelineState(ci, &pipeline);
 
 	result->value = pipeline;
+#ifdef RENGINE_DEBUG
 	if (!pipeline)
 		result->error = "Could not possible to create compute IPipelineState";
+#endif
 }
 
 RENGINE void rengine_device_create_texture(
 	Diligent::IRenderDevice* device,
-	REngine::TextureDesc* desc,
-	REngine::TextureData* data,
+	REngine::TextureDescDTO* desc,
+	REngine::TextureDataDTO* data,
 	uint numTexData,
 	REngine::Result* result
 )
 {
+#ifdef RENGINE_DEBUG
 	if (!device) {
 		result->error = "Device is required";
 		return;
@@ -155,6 +171,7 @@ RENGINE void rengine_device_create_texture(
 		result->error = "Texture Description is required";
 		return; 
 	}
+#endif
 
 	Diligent::ITexture* texture = null;
 	Diligent::TextureDesc texDesc;
@@ -168,6 +185,8 @@ RENGINE void rengine_device_create_texture(
 	device->CreateTexture(texDesc, numTexData > 0 ? &texData : null, &texture);
 
 	result->value = texture;
+#ifdef RENGINE_DEBUG
 	if (!texture)
 		result->error = "Could not possible to create texture";
+#endif
 }

@@ -152,7 +152,7 @@ static Diligent::TEXTURE_ADDRESS_MODE s_addressModes[] = {
 };
 
 void rengine_pipelinestate_fill(
-	REngine::GraphicsPipelineDesc* desc, 
+	REngine::GraphicsPipelineDescDTO* desc, 
 	bool isOpenGl, 
 	std::vector<Diligent::LayoutElement>& layoutElements,
 	std::vector<Diligent::ImmutableSamplerDesc>& immutableSamplers, 
