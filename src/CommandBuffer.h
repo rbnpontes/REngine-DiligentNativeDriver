@@ -6,23 +6,23 @@ RENGINE void rengine_cmdbuffer_cleardepth(
 	Diligent::ITextureView* depthStencil,
 	Diligent::CLEAR_DEPTH_STENCIL_FLAGS clearFlags,
 	float depth,
-	byte stencil,
-	byte isDeferred);
+	u8 stencil,
+	u8 isDeferred);
 RENGINE void rengine_cmdbuffer_clearrt(
 	Diligent::IDeviceContext* context,
 	Diligent::ITextureView* rt,
 	float* color,
-	byte isDeferred
+	u8 isDeferred
 );
 RENGINE void rengine_cmdbuffer_commitbindings(
 	Diligent::IDeviceContext* context,
 	Diligent::IShaderResourceBinding* shaderRes,
-	byte isDeferred
+	u8 isDeferred
 );
 RENGINE void rengine_cmdbuffer_copy_tex(
 	Diligent::IDeviceContext* context,
 	REngine::CopyTextureInfoDTO* copyInfo,
-	byte isDeferred
+	u8 isDeferred
 );
 RENGINE void rengine_cmdbuffer_draw(
 	Diligent::IDeviceContext* context,
@@ -46,16 +46,17 @@ RENGINE void rengine_cmdbuffer_unmap(
 RENGINE void rengine_cmdbuffer_setibuffer(
 	Diligent::IDeviceContext* context,
 	Diligent::IBuffer* buffer,
-	ulong byteOffset,
-	byte isDeferred
+	u64 byteOffset,
+	u8 isDeferred
 );
 RENGINE void rengine_cmdbuffer_setvbuffer(
 	Diligent::IDeviceContext* context,
-	uint startSlot,
-	uint numBuffers,
+	u32 startSlot,
+	u32 numBuffers,
 	Diligent::IBuffer** buffers,
-	ulong* offsets,
-	byte isDeferred
+	u64* offsets,
+	u8 reset,
+	u8 isDeferred
 );
 RENGINE void rengine_cmdbuffer_setpipeline(
 	Diligent::IDeviceContext* context,
@@ -64,15 +65,15 @@ RENGINE void rengine_cmdbuffer_setpipeline(
 RENGINE void rengine_cmdbuffer_setrts(
 	Diligent::IDeviceContext* context,
 	Diligent::ITextureView** rts,
-	byte numRts,
+	u8 numRts,
 	Diligent::ITextureView* depth,
-	byte isDeferred
+	u8 isDeferred
 );
 RENGINE void rengine_cmdbuffer_updtbuffer(
 	Diligent::IDeviceContext* context,
 	Diligent::IBuffer* buffer,
-	ulong offset,
-	ulong size,
+	u64 offset,
+	u64 size,
 	void* ptr,
-	byte isDeferred
+	u8 isDeferred
 );

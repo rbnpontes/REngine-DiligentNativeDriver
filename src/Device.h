@@ -4,7 +4,7 @@
 RENGINE void rengine_device_create_buffer(
 	Diligent::IRenderDevice* device,
 	REngine::BufferDescDTO* desc,
-	ulong size,
+	u64 size,
 	void* data,
 	REngine::Result* result
 );
@@ -16,19 +16,19 @@ RENGINE void rengine_device_create_shader(
 RENGINE void rengine_device_create_graphicspipeline(
 	Diligent::IRenderDevice* device,
 	REngine::GraphicsPipelineDescDTO* desc,
-	byte isOpenGl,
+	u8 isOpenGl,
 	REngine::Result* result
 );
 RENGINE void rengine_device_create_computepipeline(
 	Diligent::IRenderDevice* device,
 	REngine::ComputePipelineDesc* desc,
-	byte isOpenGl,
+	u8 isOpenGl,
 	REngine::Result* result
 );
 RENGINE void rengine_device_create_texture(
 	Diligent::IRenderDevice* device,
 	REngine::TextureDescDTO* desc,
 	REngine::TextureDataDTO* data,
-	uint numTexData,
+	u32 numTexData,
 	REngine::Result* result
 );

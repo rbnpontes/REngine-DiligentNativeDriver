@@ -7,7 +7,7 @@
 
 namespace REngine
 {
-	enum class GraphicsBackend : byte {
+	enum class GraphicsBackend : u8 {
 		Unknow =0,
 		D3D11,
 		D3D12,
@@ -16,7 +16,7 @@ namespace REngine
 		OpenGL,
 		Software
 	};
-	enum class AdapterType : byte {
+	enum class AdapterType : u8 {
 		Unknow = 0,
 		Software,
 		Integrated,
@@ -26,31 +26,31 @@ namespace REngine
 
 #ifdef WIN32
 	struct D3D12Settings {
-		uint* cpuDescriptorHeapAllocationSize;
-		uint* gpuDescriptorHeapSize;
-		uint* gpuDescriptorHeapDynamicSize;
-		uint* dynamicDescriptorAllocationChunkSize;
-		uint* queryPoolSize;
+		u32* cpuDescriptorHeapAllocationSize;
+		u32* gpuDescriptorHeapSize;
+		u32* gpuDescriptorHeapDynamicSize;
+		u32* dynamicDescriptorAllocationChunkSize;
+		u32* queryPoolSize;
 
-		uint dynamicHeapPageSize;
-		uint numDynamicHeapPagesToReserve;
+		u32 dynamicHeapPageSize;
+		u32 numDynamicHeapPagesToReserve;
 	};
 
 #endif
 
 	struct VulkanSettings {
 		struct DescriptorPoolSize {
-			uint max;
-			uint sepSm;
-			uint cmbSm;
-			uint smpImg;
-			uint strImg;
-			uint ub;
-			uint sb;
-			uint utxb;
-			uint stTxB;
-			uint inptAtt;
-			uint accelSt;
+			u32 max;
+			u32 sepSm;
+			u32 cmbSm;
+			u32 smpImg;
+			u32 strImg;
+			u32 ub;
+			u32 sb;
+			u32 utxb;
+			u32 stTxB;
+			u32 inptAtt;
+			u32 accelSt;
 		};
 
 		string** instanceLayerNames;
@@ -58,23 +58,23 @@ namespace REngine
 		string** deviceExtensionNames;
 		string** ignoreDebugMessageNames;
 
-		uint instanceLayerNamesCount;
-		uint instanceExtensionNamesCount;
-		uint deviceExtensionNamesCount;
-		uint ignoreDebugMessageNamesCount;
+		u32 instanceLayerNamesCount;
+		u32 instanceExtensionNamesCount;
+		u32 deviceExtensionNamesCount;
+		u32 ignoreDebugMessageNamesCount;
 
 		DescriptorPoolSize* mainDescriptorPoolSize;
 		DescriptorPoolSize* dynamicDescriptorPoolSize;
 
-		uint deviceLocalMemoryPageSize;
-		uint hostVisibleMemoryPageSize;
-		uint deviceLocalMemoryReserveSize;
-		uint hostVisibleMemoryReserveSize;
-		uint uploadHeapPageSize;
-		uint dynamicHeapSize;
-		uint dynamicHeapPageSize;
+		u32 deviceLocalMemoryPageSize;
+		u32 hostVisibleMemoryPageSize;
+		u32 deviceLocalMemoryReserveSize;
+		u32 hostVisibleMemoryReserveSize;
+		u32 uploadHeapPageSize;
+		u32 dynamicHeapSize;
+		u32 dynamicHeapPageSize;
 
-		uint* queryPoolSizes;
+		u32* queryPoolSizes;
 	};
 
 	struct GraphicsDriverSettings {
@@ -85,15 +85,15 @@ namespace REngine
 		boolean enableValidation;
 		GraphicsBackend backend;
 
-		uint adapterId;
-		uint numDeferredCtx;
+		u32 adapterId;
+		u32 numDeferredCtx;
 		void* messageCallback;
 	};
 
 	struct GraphicsAdapter {
-		uint id;
-		uint vendorId;
-		uint deviceId;
+		u32 id;
+		u32 vendorId;
+		u32 deviceId;
 		string* name;
 		AdapterType adapterType;
 	};
@@ -116,18 +116,18 @@ namespace REngine
 	};
 
 	struct SwapChainDesc {
-		uint width;
-		uint height;
+		u32 width;
+		u32 height;
 
-		ushort colorFormat;
-		ushort depthFormat;
+		u16 colorFormat;
+		u16 depthFormat;
 
-		uint usage;
-		uint transform;
+		u32 usage;
+		u32 transform;
 
-		uint bufferCount;
+		u32 bufferCount;
 		float defaultDepthValue;
-		byte defaultStencilValue;
+		u8 defaultStencilValue;
 		boolean isPrimary;
 	};
 
@@ -142,28 +142,28 @@ namespace REngine
 
 	struct CopyTextureInfoDTO {
 		Diligent::ITexture* srcTexture;
-		uint srcMipLevel;
-		uint srcSlice;
+		u32 srcMipLevel;
+		u32 srcSlice;
 		Diligent::Box* srcBox;
 		Diligent::ITexture* dstTexture;
-		uint dstMipLevel;
-		uint dstSlice;
-		uint dstX;
-		uint dstY;
-		uint dstZ;
+		u32 dstMipLevel;
+		u32 dstSlice;
+		u32 dstX;
+		u32 dstY;
+		u32 dstZ;
 	};
 
 	struct BufferDescDTO {
 		string* name;
-		ulong size;
+		u64 size;
 		Diligent::BIND_FLAGS bindFlags;
 		Diligent::USAGE usage;
 		Diligent::CPU_ACCESS_FLAGS accessFlags;
 		Diligent::BUFFER_MODE mode;
-		uint elementByteStride;
+		u32 elementByteStride;
 	};
 
-	enum class ShaderType : byte {
+	enum class ShaderType : u8 {
 		Vertex =0,
 		Pixel,
 		Compute,
@@ -187,14 +187,14 @@ namespace REngine
 		string* name;
 		ShaderType type;
 		string* sourceCode;
-		byte* byteCode;
-		uint byteCodeLength;
+		u8* byteCode;
+		u32 byteCodeLength;
 		string** macroKeys;
 		string** macroValues;
-		uint numMacros;
+		u32 numMacros;
 	};
 
-	enum class ElementType : byte {
+	enum class ElementType : u8 {
 		Int,
 		Float,
 		Vector2,
@@ -205,20 +205,20 @@ namespace REngine
 	};
 
 	struct PipelineInputLayoutElementDesc {
-		uint inputIndex;
-		uint bufferIndex;
-		uint bufferStride;
-		uint elementOffset;
-		uint instanceStepRate;
+		u32 inputIndex;
+		u32 bufferIndex;
+		u32 bufferStride;
+		u32 elementOffset;
+		u32 instanceStepRate;
 		ElementType elementType;
 	};
 
-	enum class TextureAddressMode : byte {
+	enum class TextureAddressMode : u8 {
 		Wrap = 0,
 		Mirror,
 		Clamp
 	};
-	enum class TextureFilterMode : byte {
+	enum class TextureFilterMode : u8 {
 		Nearest,
 		Bilinear,
 		Trilinear,
@@ -230,8 +230,8 @@ namespace REngine
 	struct ImmutableSamplerDesc {
 		string* name;
 		TextureFilterMode sampler_filterMode;
-		byte sampler_anisotropy;
-		byte sampler_shadowCmp;
+		u8 sampler_anisotropy;
+		u8 sampler_shadowCmp;
 		TextureAddressMode sampler_addressMode_u;
 		TextureAddressMode sampler_addressMode_v;
 		TextureAddressMode sampler_addressMode_w;
@@ -240,40 +240,40 @@ namespace REngine
 	struct GraphicsPipelineDescDTO {
 		string* name;
 
-		byte blendState_colorWriteEnabled;
-		byte blendState_blendMode;
-		byte blendState_alphaToCoverage;
+		u8 blendState_colorWriteEnabled;
+		u8 blendState_blendMode;
+		u8 blendState_alphaToCoverage;
 
-		byte rasterizerState_fillMode;
-		byte rasterizerState_cullMode;
+		u8 rasterizerState_fillMode;
+		u8 rasterizerState_cullMode;
 		float rasterizerState_constantDepthBias;
 		float rasterizerState_slopeScaledDepthBias;
-		byte rasterizerState_scissorTestEnabled;
-		byte rasterizerState_lineAntiAlias;
+		u8 rasterizerState_scissorTestEnabled;
+		u8 rasterizerState_lineAntiAlias;
 
-		byte depthStencilState_enableDepth;
-		byte depthStencilState_depthWriteEnabled;
-		byte depthStencilState_stencilTestEnabled;
-		byte depthStencilState_depthCmpFunc;
-		byte depthStencilState_stencilCmpFunc;
-		byte depthStencilState_stencilOpOnPassed;
-		byte depthStencilState_stencilOpOnStencilFailed;
-		byte depthStencilState_stencilOpOnDepthFailed;
-		byte depthStencilState_stencilCmpMask;
-		byte depthStencilState_stencilWriteMask;
+		u8 depthStencilState_enableDepth;
+		u8 depthStencilState_depthWriteEnabled;
+		u8 depthStencilState_stencilTestEnabled;
+		u8 depthStencilState_depthCmpFunc;
+		u8 depthStencilState_stencilCmpFunc;
+		u8 depthStencilState_stencilOpOnPassed;
+		u8 depthStencilState_stencilOpOnStencilFailed;
+		u8 depthStencilState_stencilOpOnDepthFailed;
+		u8 depthStencilState_stencilCmpMask;
+		u8 depthStencilState_stencilWriteMask;
 
-		byte primitiveType;
+		u8 primitiveType;
 
 		PipelineInputLayoutElementDesc* inputLayouts;
-		byte numInputLayouts;
+		u8 numInputLayouts;
 
-		ushort output_depthStencilFormat;
-		ushort* output_rtFormats;
-		byte output_numRtFormats;
-		byte output_multiSample;
+		u16 output_depthStencilFormat;
+		u16* output_rtFormats;
+		u8 output_numRtFormats;
+		u8 output_multiSample;
 
 		ImmutableSamplerDesc* immutableSamplers;
-		byte numImmutableSamplers;
+		u8 numImmutableSamplers;
 
 		Diligent::IShader* shader_vs;
 		Diligent::IShader* shader_ps;
@@ -286,7 +286,7 @@ namespace REngine
 		string* name;
 
 		ImmutableSamplerDesc* samplers;
-		byte numSamplers;
+		u8 numSamplers;
 
 		Diligent::IShader* shader;
 	};
@@ -294,44 +294,44 @@ namespace REngine
 	struct TextureDescDTO {
 		string* name;
 		Diligent::RESOURCE_DIMENSION dimension;
-		uint width;
-		uint height;
-		uint arraySizeOrDepth;
-		ushort format;
-		uint mipLevels;
-		uint sampleCount;
+		u32 width;
+		u32 height;
+		u32 arraySizeOrDepth;
+		u16 format;
+		u32 mipLevels;
+		u32 sampleCount;
 		Diligent::BIND_FLAGS bindFlags;
 		Diligent::USAGE usage;
 		Diligent::CPU_ACCESS_FLAGS accessFlags;
 		Diligent::MISC_TEXTURE_FLAGS textureFlags;
 
-		ushort clear_format;
+		u16 clear_format;
 		float clear_r;
 		float clear_g;
 		float clear_b;
 		float clear_a;
 
 		float clear_depth;
-		byte clear_stencil;
+		u8 clear_stencil;
 	};
 
 	struct TextureViewDesc {
 		Diligent::TEXTURE_VIEW_TYPE viewType;
 		Diligent::RESOURCE_DIMENSION dimension;
 		Diligent::TEXTURE_FORMAT format;
-		uint mostDetailedMip;
-		uint mipLevels;
-		uint firstSlice;
-		uint slicesCount;
+		u32 mostDetailedMip;
+		u32 mipLevels;
+		u32 firstSlice;
+		u32 slicesCount;
 		Diligent::UAV_ACCESS_FLAG accessFlags;
-		byte allowMipMapGeneration;
+		u8 allowMipMapGeneration;
 	};
 
 	struct TextureDataDTO {
 		void* data;
 		Diligent::IBuffer* srcBuffer;
-		ulong srcOffset;
-		ulong stride;
-		ulong depthStride;
+		u64 srcOffset;
+		u64 stride;
+		u64 depthStride;
 	};
 }

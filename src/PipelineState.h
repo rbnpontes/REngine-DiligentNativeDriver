@@ -17,12 +17,12 @@ void rengine_pipelinestate_fill(
 );
 void rengine_pipelinestate_fill(
 	REngine::PipelineInputLayoutElementDesc* inputLayout,
-	byte numInputLayout,
+	u8 numInputLayout,
 	std::vector<Diligent::LayoutElement>& layoutElements
 );
 void rengine_pipelinestate_fill(
 	REngine::ImmutableSamplerDesc* samplers,
-	byte numSamplers,
+	u8 numSamplers,
 	std::vector<Diligent::ImmutableSamplerDesc>& immutableSamplers,
 	Diligent::SHADER_TYPE shaderTypes = Diligent::SHADER_TYPE_ALL_GRAPHICS
 );

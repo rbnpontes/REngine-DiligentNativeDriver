@@ -3,7 +3,7 @@
 #include <string>
 
 static std::vector<std::string> g_strings;
-static uint g_next = 0;
+static u32 g_next = 0;
 
 
 const char* rengine_stringdb_store(const char* str)

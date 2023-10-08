@@ -26,11 +26,11 @@ void rengine_fill_create_info(GraphicsDriverSettings* settings, Diligent::Engine
 void rengine_fill_d3d12_create_info(GraphicsDriverSettings* settings, Diligent::EngineD3D12CreateInfo* ci) {
 	rengine_fill_create_info(settings, ci);
 
-	memcpy(ci->CPUDescriptorHeapAllocationSize, settings->d3d12->cpuDescriptorHeapAllocationSize, sizeof(uint) * 4);
-	memcpy(ci->GPUDescriptorHeapSize, settings->d3d12->gpuDescriptorHeapSize, sizeof(uint) * 2);
-	memcpy(ci->GPUDescriptorHeapDynamicSize, settings->d3d12->gpuDescriptorHeapDynamicSize, sizeof(uint) * 2);
-	memcpy(ci->DynamicDescriptorAllocationChunkSize, settings->d3d12->dynamicDescriptorAllocationChunkSize, sizeof(uint) * 2);
-	memcpy(ci->QueryPoolSizes, settings->d3d12->queryPoolSize, sizeof(uint) * Diligent::QUERY_TYPE_NUM_TYPES);
+	memcpy(ci->CPUDescriptorHeapAllocationSize, settings->d3d12->cpuDescriptorHeapAllocationSize, sizeof(u32) * 4);
+	memcpy(ci->GPUDescriptorHeapSize, settings->d3d12->gpuDescriptorHeapSize, sizeof(u32) * 2);
+	memcpy(ci->GPUDescriptorHeapDynamicSize, settings->d3d12->gpuDescriptorHeapDynamicSize, sizeof(u32) * 2);
+	memcpy(ci->DynamicDescriptorAllocationChunkSize, settings->d3d12->dynamicDescriptorAllocationChunkSize, sizeof(u32) * 2);
+	memcpy(ci->QueryPoolSizes, settings->d3d12->queryPoolSize, sizeof(u32) * Diligent::QUERY_TYPE_NUM_TYPES);
 
 	ci->DynamicHeapPageSize = settings->d3d12->dynamicHeapPageSize;
 	ci->NumDynamicHeapPagesToReserve = settings->d3d12->numDynamicHeapPagesToReserve;
@@ -52,7 +52,7 @@ void rengine_fill_descriptor_pool_size(VulkanSettings::DescriptorPoolSize* desc,
 void rengine_fill_vk_create_info(GraphicsDriverSettings* settings, Diligent::EngineVkCreateInfo* ci) {
 	rengine_fill_create_info(settings, ci);
 
-	memcpy(ci->QueryPoolSizes, settings->d3d12->queryPoolSize, sizeof(uint) * Diligent::QUERY_TYPE_NUM_TYPES);
+	memcpy(ci->QueryPoolSizes, settings->vulkan->queryPoolSizes, sizeof(u32) * Diligent::QUERY_TYPE_NUM_TYPES);
 	
 	ci->InstanceLayerCount = settings->vulkan->instanceLayerNamesCount;
 	ci->ppInstanceLayerNames = settings->vulkan->instanceLayerNames;
@@ -95,7 +95,7 @@ bool rengine_is_valid_window(Diligent::NativeWindow* window) {
 	return false;
 }
 
-RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent, Result* result, uint* length) {
+RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent, Result* result, u32* length) {
 	using namespace Diligent;
 	Diligent::Version graphicsVersion;
 
@@ -112,7 +112,7 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	}
 
 	IEngineFactory* factory = null;
-	DebugMessageCallbackType callback = static_cast<DebugMessageCallbackType>(messageEvent);
+	DebugMessageCallbackType callback = reinterpret_cast<DebugMessageCallbackType>(messageEvent);
 
 	switch (backend)
 	{
@@ -153,7 +153,7 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	if (!factory)
 		return;
 
-	uint adaptersCount = 0;
+	u32 adaptersCount = 0;
 	std::vector<GraphicsAdapterInfo> adapters;
 	factory->EnumerateAdapters(graphicsVersion, adaptersCount, nullptr);
 	adapters.resize(adaptersCount);
@@ -162,7 +162,7 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	factory->Release();
 
 	GraphicsAdapter* finalAdapters = new GraphicsAdapter[adaptersCount];
-	for (uint i = 0; i < adaptersCount; ++i) {
+	for (u32 i = 0; i < adaptersCount; ++i) {
 		finalAdapters[i].id = i;
 		finalAdapters[i].deviceId = adapters[i].DeviceId;
 		finalAdapters[i].adapterType = (AdapterType)adapters[i].Type;
@@ -205,7 +205,7 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 
 	IEngineFactory* factory = null;
 
-	DebugMessageCallbackType callback = static_cast<DebugMessageCallbackType>(settings->messageCallback);
+	DebugMessageCallbackType callback = reinterpret_cast<DebugMessageCallbackType>(settings->messageCallback);
 
 	switch (settings->backend)
 	{

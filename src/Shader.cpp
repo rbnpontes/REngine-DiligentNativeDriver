@@ -15,7 +15,7 @@ void rengine_shader_fill(REngine::ShaderCreateInfoDTO* ci, Diligent::ShaderCreat
 	macros.resize(ci->numMacros);
 
 	output->Desc.Name = ci->name;
-	output->Desc.ShaderType = s_shaderTypes[(byte)ci->type];
+	output->Desc.ShaderType = s_shaderTypes[(u8)ci->type];
 	output->Desc.UseCombinedTextureSamplers = true;
 	output->ByteCode = ci->byteCode;
 	output->ByteCodeSize = ci->byteCodeLength;
@@ -24,7 +24,7 @@ void rengine_shader_fill(REngine::ShaderCreateInfoDTO* ci, Diligent::ShaderCreat
 		output->SourceLength = strlen(ci->sourceCode);
 	output->SourceLanguage = Diligent::SHADER_SOURCE_LANGUAGE_HLSL;
 
-	for (uint i = 0; i < ci->numMacros; ++i) {
+	for (u32 i = 0; i < ci->numMacros; ++i) {
 		macros[i].Name = ci->macroKeys[i];
 		macros[i].Definition = ci->macroValues[i];
 	}

@@ -1,6 +1,6 @@
 #include "./CommandBuffer.h"
 
-Diligent::RESOURCE_STATE_TRANSITION_MODE rengine_cmdbuffer_get_state(byte isDeferred) {
+Diligent::RESOURCE_STATE_TRANSITION_MODE rengine_cmdbuffer_get_state(u8 isDeferred) {
 	return isDeferred ? Diligent::RESOURCE_STATE_TRANSITION_MODE_VERIFY : Diligent::RESOURCE_STATE_TRANSITION_MODE_TRANSITION;
 }
 
@@ -9,8 +9,8 @@ RENGINE void rengine_cmdbuffer_cleardepth(
 	Diligent::ITextureView* depthStencil,
 	Diligent::CLEAR_DEPTH_STENCIL_FLAGS clearFlags,
 	float depth,
-	byte stencil,
-	byte isDeferred)
+	u8 stencil,
+	u8 isDeferred)
 {
 	if (!context)
 		return;
@@ -27,7 +27,7 @@ RENGINE void rengine_cmdbuffer_clearrt(
 	Diligent::IDeviceContext* context,
 	Diligent::ITextureView* rt,
 	float* color,
-	byte isDeferred
+	u8 isDeferred
 )
 {
 	if (!context)
@@ -43,7 +43,7 @@ RENGINE void rengine_cmdbuffer_clearrt(
 RENGINE void rengine_cmdbuffer_commitbindings(
 	Diligent::IDeviceContext* context,
 	Diligent::IShaderResourceBinding* shaderRes,
-	byte isDeferred
+	u8 isDeferred
 )
 {
 	if (!context)
@@ -55,7 +55,7 @@ RENGINE void rengine_cmdbuffer_commitbindings(
 RENGINE void rengine_cmdbuffer_copy_tex(
 	Diligent::IDeviceContext* context,
 	REngine::CopyTextureInfoDTO* copyInfo,
-	byte isDeferred
+	u8 isDeferred
 )
 {
 	if (!context)
@@ -133,8 +133,8 @@ RENGINE void rengine_cmdbuffer_unmap(
 RENGINE void rengine_cmdbuffer_setibuffer(
 	Diligent::IDeviceContext* context,
 	Diligent::IBuffer* buffer,
-	ulong byteOffset,
-	byte isDeferred
+	u64 byteOffset,
+	u8 isDeferred
 )
 {
 	if (!context)
@@ -144,11 +144,12 @@ RENGINE void rengine_cmdbuffer_setibuffer(
 
 RENGINE void rengine_cmdbuffer_setvbuffer(
 	Diligent::IDeviceContext* context,
-	uint startSlot,
-	uint numBuffers,
+	u32 startSlot,
+	u32 numBuffers,
 	Diligent::IBuffer** buffers,
-	ulong* offsets,
-	byte isDeferred
+	u64* offsets,
+	u8 reset,
+	u8 isDeferred
 )
 {
 	if (!context)
@@ -159,7 +160,8 @@ RENGINE void rengine_cmdbuffer_setvbuffer(
 		numBuffers,
 		buffers,
 		offsets,
-		rengine_cmdbuffer_get_state(isDeferred)
+		rengine_cmdbuffer_get_state(isDeferred),
+		reset ? Diligent::SET_VERTEX_BUFFERS_FLAG_RESET : Diligent::SET_VERTEX_BUFFERS_FLAG_NONE
 	);
 }
 
@@ -177,9 +179,9 @@ RENGINE void rengine_cmdbuffer_setpipeline(
 RENGINE void rengine_cmdbuffer_setrts(
 	Diligent::IDeviceContext* context,
 	Diligent::ITextureView** rts,
-	byte numRts,
+	u8 numRts,
 	Diligent::ITextureView* depth,
-	byte isDeferred
+	u8 isDeferred
 )
 {
 	if (!context)
@@ -195,10 +197,10 @@ RENGINE void rengine_cmdbuffer_setrts(
 RENGINE void rengine_cmdbuffer_updtbuffer(
 	Diligent::IDeviceContext* context,
 	Diligent::IBuffer* buffer,
-	ulong offset,
-	ulong size,
+	u64 offset,
+	u64 size,
 	void* ptr,
-	byte isDeferred
+	u8 isDeferred
 ) 
 {
 	if (!context)

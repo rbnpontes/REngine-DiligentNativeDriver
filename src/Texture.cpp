@@ -26,7 +26,7 @@ void rengine_texture_fill(REngine::TextureDescDTO* desc, Diligent::TextureDesc* 
 
 void rengine_texture_fill(
 	REngine::TextureDataDTO* data,
-	uint numTexData,
+	u32 numTexData,
 	std::vector<Diligent::TextureSubResData>& subresources,
 	Diligent::TextureData* output
 )
@@ -35,7 +35,7 @@ void rengine_texture_fill(
 	output->NumSubresources = numTexData;
 	output->pSubResources = subresources.data();
 	
-	for (uint i = 0; i < numTexData; ++i) {
+	for (u32 i = 0; i < numTexData; ++i) {
 		subresources[i].pData = data[i].data;
 		subresources[i].DepthStride = data[i].depthStride;
 		subresources[i].pSrcBuffer = data[i].srcBuffer;

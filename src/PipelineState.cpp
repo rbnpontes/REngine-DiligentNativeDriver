@@ -104,7 +104,7 @@ static Diligent::FILL_MODE s_fillMode[] = {
 	Diligent::FILL_MODE_SOLID,
 	Diligent::FILL_MODE_WIREFRAME,
 };
-static uint s_numComponents[] = {
+static u32 s_numComponents[] = {
 	1,
 	1,
 	2,
@@ -178,7 +178,7 @@ void rengine_pipelinestate_fill(
 
 	output->GraphicsPipeline.PrimitiveTopology = s_primitiveTopologies[desc->primitiveType];
 	output->GraphicsPipeline.NumRenderTargets = desc->output_numRtFormats;
-	for (byte i = 0; i < desc->output_numRtFormats; ++i)
+	for (u8 i = 0; i < desc->output_numRtFormats; ++i)
 		output->GraphicsPipeline.RTVFormats[i] = (Diligent::TEXTURE_FORMAT)desc->output_rtFormats[i];
 	output->GraphicsPipeline.DSVFormat = (Diligent::TEXTURE_FORMAT)desc->output_depthStencilFormat;
 	output->GraphicsPipeline.SmplDesc.Count = desc->output_multiSample;
@@ -187,7 +187,7 @@ void rengine_pipelinestate_fill(
 	output->GraphicsPipeline.BlendDesc.IndependentBlendEnable = false;
 
 	if (desc->output_numRtFormats > 0) {
-		byte blendModeIdx = desc->blendState_blendMode;
+		u8 blendModeIdx = desc->blendState_blendMode;
 		output->GraphicsPipeline.BlendDesc.RenderTargets[0].BlendEnable = s_isBlendEnabled[blendModeIdx];
 		output->GraphicsPipeline.BlendDesc.RenderTargets[0].SrcBlend = s_sourceBlends[blendModeIdx];
 		output->GraphicsPipeline.BlendDesc.RenderTargets[0].DestBlend = s_destBlends[blendModeIdx];
@@ -220,7 +220,7 @@ void rengine_pipelinestate_fill(
 	backFace.StencilPassOp = s_stencilOperations[desc->depthStencilState_stencilOpOnPassed];
 	backFace.StencilFunc = s_comparisonFunctions[desc->depthStencilState_stencilCmpFunc];
 
-	uint depthBits = 24;
+	u32 depthBits = 24;
 	if (desc->output_depthStencilFormat == Diligent::TEX_FORMAT_D16_UNORM)
 		depthBits = 16;
 
@@ -257,19 +257,19 @@ void rengine_pipelinestate_fill(
 
 void rengine_pipelinestate_fill(
 	REngine::PipelineInputLayoutElementDesc* inputLayout,
-	byte numInputLayout,
+	u8 numInputLayout,
 	std::vector<Diligent::LayoutElement>& layoutElements
 )
 {
 	layoutElements.resize(numInputLayout);
 
-	for (byte i = 0; i < numInputLayout; ++i) 
+	for (u8 i = 0; i < numInputLayout; ++i) 
 	{
 		layoutElements[i].InputIndex = inputLayout[i].inputIndex;
 		layoutElements[i].RelativeOffset = inputLayout[i].elementOffset;
-		layoutElements[i].NumComponents = s_numComponents[(byte)inputLayout[i].elementType];
-		layoutElements[i].ValueType = s_valueTypes[(byte)inputLayout[i].elementType];
-		layoutElements[i].IsNormalized = s_isNormalized[(byte)inputLayout[i].elementType];
+		layoutElements[i].NumComponents = s_numComponents[(u8)inputLayout[i].elementType];
+		layoutElements[i].ValueType = s_valueTypes[(u8)inputLayout[i].elementType];
+		layoutElements[i].IsNormalized = s_isNormalized[(u8)inputLayout[i].elementType];
 		layoutElements[i].BufferSlot = inputLayout[i].bufferIndex;
 		layoutElements[i].Stride = inputLayout[i].bufferStride;
 		layoutElements[i].Frequency = inputLayout[i].instanceStepRate != 0
@@ -281,27 +281,27 @@ void rengine_pipelinestate_fill(
 
 void rengine_pipelinestate_fill(
 	REngine::ImmutableSamplerDesc* samplers,
-	byte numSamplers,
+	u8 numSamplers,
 	std::vector<Diligent::ImmutableSamplerDesc>& immutableSamplers,
 	Diligent::SHADER_TYPE shaderTypes
 )
 {
 	immutableSamplers.resize(numSamplers);
 
-	for (byte i = 0; i < numSamplers; ++i) {
-		byte filterModeIdx = (byte)(samplers[i].sampler_filterMode == REngine::TextureFilterMode::Default
+	for (u8 i = 0; i < numSamplers; ++i) {
+		u8 filterModeIdx = (u8)(samplers[i].sampler_filterMode == REngine::TextureFilterMode::Default
 			? SAMPLER_DEFAULT_FILTER_MODE
 			: samplers[i].sampler_filterMode);
-		byte shadowCmp = samplers[i].sampler_shadowCmp ? 1 : 0;
+		u8 shadowCmp = samplers[i].sampler_shadowCmp ? 1 : 0;
 
 		immutableSamplers[i].ShaderStages = shaderTypes;
 		immutableSamplers[i].SamplerOrTextureName = samplers[i].name;
 		immutableSamplers[i].Desc.MinFilter = s_minMagFilters[filterModeIdx][shadowCmp];
 		immutableSamplers[i].Desc.MagFilter = s_minMagFilters[filterModeIdx][shadowCmp];
 		immutableSamplers[i].Desc.MipFilter = s_mipFilters[filterModeIdx][shadowCmp];
-		immutableSamplers[i].Desc.AddressU = s_addressModes[(byte)samplers[i].sampler_addressMode_u];
-		immutableSamplers[i].Desc.AddressV = s_addressModes[(byte)samplers[i].sampler_addressMode_v];
-		immutableSamplers[i].Desc.AddressW = s_addressModes[(byte)samplers[i].sampler_addressMode_w];
+		immutableSamplers[i].Desc.AddressU = s_addressModes[(u8)samplers[i].sampler_addressMode_u];
+		immutableSamplers[i].Desc.AddressV = s_addressModes[(u8)samplers[i].sampler_addressMode_v];
+		immutableSamplers[i].Desc.AddressW = s_addressModes[(u8)samplers[i].sampler_addressMode_w];
 		immutableSamplers[i].Desc.MaxAnisotropy = samplers[i].sampler_anisotropy == 0
 			? SAMPLER_DEFAULT_TEX_ANISOTROPY
 			: samplers[i].sampler_anisotropy;

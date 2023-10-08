@@ -35,13 +35,13 @@ RENGINE void rengine_swapchain_get_desc(Diligent::ISwapChain* swapChain, REngine
 	output->isPrimary = desc.IsPrimary ? 1 : 0;
 }
 
-RENGINE void rengine_swapchain_present(Diligent::ISwapChain* swapChain, uint sync) 
+RENGINE void rengine_swapchain_present(Diligent::ISwapChain* swapChain, u32 sync) 
 {
 	if(swapChain)
 		swapChain->Present(sync);
 }
 
-RENGINE void rengine_swapchain_resize(Diligent::ISwapChain* swapChain, uint width, uint height, uint transform)
+RENGINE void rengine_swapchain_resize(Diligent::ISwapChain* swapChain, u32 width, u32 height, u32 transform)
 {
 	if (swapChain)
 		swapChain->Resize(width, height, (Diligent::SURFACE_TRANSFORM)transform);
