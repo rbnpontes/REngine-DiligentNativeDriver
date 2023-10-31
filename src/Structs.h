@@ -200,8 +200,7 @@ namespace REngine
 		Vector2,
 		Vector3,
 		Vector4,
-		UByte4,
-		UByte4Norm
+		UByte4
 	};
 
 	struct PipelineInputLayoutElementDesc {
@@ -211,6 +210,7 @@ namespace REngine
 		u32 elementOffset;
 		u32 instanceStepRate;
 		ElementType elementType;
+		u8 normalized;
 	};
 
 	enum class TextureAddressMode : u8 {

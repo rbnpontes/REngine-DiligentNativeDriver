@@ -77,3 +77,48 @@ RENGINE void rengine_cmdbuffer_updtbuffer(
 	void* ptr,
 	u8 isDeferred
 );
+
+RENGINE void rengine_cmdbuffer_setblendfactors(
+	Diligent::IDeviceContext* context,
+	float r,
+	float g,
+	float b,
+	float a
+);
+
+RENGINE void rengine_cmdbuffer_setviewports(
+	Diligent::IDeviceContext* context,
+	Diligent::Viewport* viewports,
+	u8 numViewports,
+	u32 rtWidth,
+	u32 rtHeight
+);
+
+RENGINE void rengine_cmdbuffer_setscissors(
+	Diligent::IDeviceContext* context,
+	Diligent::Rect* scissors,
+	u8 numScissors,
+	u32 rtWidth,
+	u32 rtHeight
+);
+
+RENGINE void rengine_cmdbuffer_compute(
+	Diligent::IDeviceContext* context,
+	Diligent::DispatchComputeAttribs* attribs
+);
+
+#if _DEBUG
+RENGINE void rengine_cmdbuffer_begin_dbg_grp(
+	Diligent::IDeviceContext* context,
+	string* name,
+	float* color
+);
+RENGINE void rengine_cmdbuffer_end_dbg_grp(
+	Diligent::IDeviceContext* context
+);
+RENGINE void rengine_cmdbuffer_insert_dbg_label(
+	Diligent::IDeviceContext* context,
+	string* label,
+	float* color
+);
+#endif

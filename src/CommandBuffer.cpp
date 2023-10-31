@@ -213,3 +213,67 @@ RENGINE void rengine_cmdbuffer_updtbuffer(
 		rengine_cmdbuffer_get_state(isDeferred)
 	);
 }
+
+RENGINE void rengine_cmdbuffer_setblendfactors(Diligent::IDeviceContext* context, float r, float g, float b, float a)
+{
+	if (!context)
+		return;
+
+	float colors[] = { r, g, b, a };
+	context->SetBlendFactors(colors);
+}
+
+RENGINE void rengine_cmdbuffer_setviewports(Diligent::IDeviceContext* context, Diligent::Viewport* viewports, u8 numViewports, u32 rtWidth, u32 rtHeight)
+{
+	if (!context)
+		return;
+
+	context->SetViewports(
+		numViewports,
+		viewports,
+		rtWidth,
+		rtHeight
+	);
+}
+
+RENGINE void rengine_cmdbuffer_setscissors(Diligent::IDeviceContext* context, Diligent::Rect* scissors, u8 numScissors, u32 rtWidth, u32 rtHeight)
+{
+	if (!context)
+		return;
+
+	context->SetScissorRects(
+		numScissors,
+		scissors,
+		rtWidth,
+		rtHeight
+	);
+}
+
+RENGINE void rengine_cmdbuffer_compute(Diligent::IDeviceContext* context, Diligent::DispatchComputeAttribs* attribs)
+{
+	if (!context)
+		return;
+
+	context->DispatchCompute(*attribs);
+}
+
+RENGINE void rengine_cmdbuffer_begin_dbg_grp(Diligent::IDeviceContext* context, string* name, float* color)
+{
+	if (!context)
+		return;
+	context->BeginDebugGroup(name, color);
+}
+
+RENGINE void rengine_cmdbuffer_end_dbg_grp(Diligent::IDeviceContext* context)
+{
+	if (!context)
+		return;
+	context->EndDebugGroup();
+}
+
+RENGINE void rengine_cmdbuffer_insert_dbg_label(Diligent::IDeviceContext* context, string* label, float* color)
+{
+	if (!context)
+		return;
+	context->InsertDebugLabel(label, color);
+}

@@ -122,15 +122,6 @@ static Diligent::VALUE_TYPE s_valueTypes[] = {
 	Diligent::VT_UINT8,
 	Diligent::VT_UINT8,
 };
-static bool s_isNormalized[] = {
-	false,
-	false,
-	false,
-	false,
-	false,
-	false,
-	true
-};
 static Diligent::FILTER_TYPE s_minMagFilters[][2] = {
 	{ Diligent::FILTER_TYPE_POINT, Diligent::FILTER_TYPE_COMPARISON_POINT },
 	{ Diligent::FILTER_TYPE_LINEAR, Diligent::FILTER_TYPE_COMPARISON_LINEAR },
@@ -269,7 +260,7 @@ void rengine_pipelinestate_fill(
 		layoutElements[i].RelativeOffset = inputLayout[i].elementOffset;
 		layoutElements[i].NumComponents = s_numComponents[(u8)inputLayout[i].elementType];
 		layoutElements[i].ValueType = s_valueTypes[(u8)inputLayout[i].elementType];
-		layoutElements[i].IsNormalized = s_isNormalized[(u8)inputLayout[i].elementType];
+		layoutElements[i].IsNormalized = inputLayout[i].normalized;
 		layoutElements[i].BufferSlot = inputLayout[i].bufferIndex;
 		layoutElements[i].Stride = inputLayout[i].bufferStride;
 		layoutElements[i].Frequency = inputLayout[i].instanceStepRate != 0
