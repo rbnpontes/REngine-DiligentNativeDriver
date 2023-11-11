@@ -25,6 +25,12 @@ RENGINE void rengine_device_create_computepipeline(
 	u8 isOpenGl,
 	REngine::Result* result
 );
+RENGINE void rengine_device_create_pscache(
+	Diligent::IRenderDevice* device,
+	void* data,
+	u64 dataSize,
+	REngine::Result* result
+);
 RENGINE void rengine_device_create_texture(
 	Diligent::IRenderDevice* device,
 	REngine::TextureDescDTO* desc,

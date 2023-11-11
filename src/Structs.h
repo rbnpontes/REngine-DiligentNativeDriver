@@ -280,6 +280,8 @@ namespace REngine
 		Diligent::IShader* shader_ds;
 		Diligent::IShader* shader_hs;
 		Diligent::IShader* shader_gs;
+
+		Diligent::IPipelineStateCache* pscache;
 	};
 
 	struct ComputePipelineDesc {
@@ -289,6 +291,8 @@ namespace REngine
 		u8 numSamplers;
 
 		Diligent::IShader* shader;
+
+		Diligent::IPipelineStateCache* pscache;
 	};
 
 	struct TextureDescDTO {

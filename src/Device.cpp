@@ -153,6 +153,32 @@ RENGINE void rengine_device_create_computepipeline(
 #endif
 }
 
+RENGINE void rengine_device_create_pscache(Diligent::IRenderDevice* device, void* data, u64 dataSize, REngine::Result* result)
+{
+#ifdef RENGINE_DEBUG
+	if (!device) {
+		result->error = "Device is required";
+		return;
+	}
+#endif
+
+	Diligent::PipelineStateCacheCreateInfo ci;
+	ci.CacheDataSize = dataSize;
+	ci.pCacheData = data;
+	ci.Desc.Mode = Diligent::PSO_CACHE_MODE_LOAD_STORE;
+	ci.Desc.Name = "REngine Pipeline State Cache";
+#ifdef RENGINE_DEBUG
+	ci.Desc.Flags = Diligent::PSO_CACHE_FLAG_VERBOSE;
+#endif
+
+	Diligent::IPipelineStateCache* cache;
+	device->CreatePipelineStateCache(ci, &cache);
+
+	result->value = cache;
+	if (cache == null)
+		result->error = "Error has ocurred while is creating Pipeline State Cache";
+}
+
 RENGINE void rengine_device_create_texture(
 	Diligent::IRenderDevice* device,
 	REngine::TextureDescDTO* desc,

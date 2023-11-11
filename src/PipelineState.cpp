@@ -227,6 +227,8 @@ void rengine_pipelinestate_fill(
 	output->GraphicsPipeline.RasterizerDesc.AntialiasedLineEnable = !isOpenGl && desc->rasterizerState_lineAntiAlias;
 	
 	output->PSODesc.ResourceLayout.DefaultVariableType = Diligent::SHADER_RESOURCE_VARIABLE_TYPE_MUTABLE;
+
+	output->pPSOCache = desc->pscache;
 }
 
 void rengine_pipelinestate_fill(
@@ -244,6 +246,8 @@ void rengine_pipelinestate_fill(
 	rengine_pipelinestate_fill(desc->samplers, desc->numSamplers, samplers);
 	output->PSODesc.ResourceLayout.ImmutableSamplers = samplers.data();
 	output->PSODesc.ResourceLayout.NumImmutableSamplers = desc->numSamplers;
+
+	output->pPSOCache = desc->pscache;
 }
 
 void rengine_pipelinestate_fill(
