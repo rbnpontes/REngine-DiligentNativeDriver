@@ -171,7 +171,7 @@ RENGINE void rengine_device_create_pscache(Diligent::IRenderDevice* device, void
 	ci.Desc.Flags = Diligent::PSO_CACHE_FLAG_VERBOSE;
 #endif
 
-	Diligent::IPipelineStateCache* cache;
+	Diligent::IPipelineStateCache* cache = null;
 	device->CreatePipelineStateCache(ci, &cache);
 
 	result->value = cache;
