@@ -22,7 +22,7 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) || defined(ANDROID)
 typedef unsigned long long u64;
 #elif defined(__GNUC__)
 typedef long unsigned int u64;
