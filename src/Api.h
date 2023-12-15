@@ -1,4 +1,6 @@
 #pragma once
+#include <stdint.h>
+
 #ifdef ENGINE_DLL
 #undef ENGINE_DLL
 #endif
@@ -22,8 +24,10 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-#if defined(_MSC_VER) || defined(ANDROID)
+#if defined(_MSC_VER)
 typedef unsigned long long u64;
+#elif defined(ANDROID)
+typedef uint64_t u64;
 #elif defined(__GNUC__)
 typedef long unsigned int u64;
 #endif
