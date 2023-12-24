@@ -22,3 +22,34 @@ RENGINE void rengine_buffer_getdesc(Diligent::IBuffer* buffer, REngine::BufferDe
 	output->elementByteStride = desc.ElementByteStride;
 	output->usage = desc.Usage;
 }
+
+RENGINE void rengine_buffer_create_view(Diligent::IBuffer* buffer, REngine::BufferViewCreateDesc* createDesc, REngine::Result* result)
+{
+	if(buffer == null)
+	{
+		result->error = "Buffer is null";
+		return;
+	}
+	Diligent::BufferViewDesc desc;
+	desc.Name = createDesc->name;
+	desc.ViewType = createDesc->viewType;
+	desc.Format.IsNormalized = createDesc->format_isNormalized;
+	desc.Format.NumComponents = createDesc->format_numComponents;
+	desc.Format.ValueType = createDesc->format_valueType;
+	desc.ByteOffset = createDesc->byteOffset;
+	desc.ByteWidth = createDesc->byteWidth;
+
+	Diligent::IBufferView* view;
+	buffer->CreateView(desc, &view);
+
+	result->value = view;
+	if (view == null)
+		result->error = "Error has occurred while is creating Buffer View";
+}
+
+RENGINE Diligent::IBufferView* rengine_buffer_get_default_view(Diligent::IBuffer* buffer, Diligent::BUFFER_VIEW_TYPE viewType)
+{
+	if (buffer == null)
+		return null;
+	return buffer->GetDefaultView(viewType);
+}

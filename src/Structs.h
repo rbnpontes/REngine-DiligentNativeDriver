@@ -338,4 +338,15 @@ namespace REngine
 		u64 stride;
 		u64 depthStride;
 	};
+
+	struct BufferViewCreateDesc
+	{
+		string* name;
+		Diligent::BUFFER_VIEW_TYPE viewType;
+		Diligent::VALUE_TYPE format_valueType;
+		u8 format_numComponents;
+		u8 format_isNormalized;
+		u64 byteOffset;
+		u64 byteWidth;
+	};
 }
