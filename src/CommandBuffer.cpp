@@ -277,3 +277,112 @@ RENGINE void rengine_cmdbuffer_insert_dbg_label(Diligent::IDeviceContext* contex
 		return;
 	context->InsertDebugLabel(label, color);
 }
+
+RENGINE void rengine_cmdbuffer_begin(
+	Diligent::IDeviceContext* context,
+	u32 immediateCtxId
+)
+{
+	if (!context)
+		return;
+	context->Begin(immediateCtxId);
+}
+
+RENGINE void rengine_cmdbuffer_finish_frame(
+	Diligent::IDeviceContext* context
+)
+{
+	if (context)
+		context->FinishFrame();
+}
+
+RENGINE Diligent::ICommandList* rengine_cmdbuffer_finish_command_list(
+	Diligent::IDeviceContext* context
+)
+{
+	if (!context)
+		return null;
+	Diligent::ICommandList* commandList;
+	context->FinishCommandList(&commandList);
+	return commandList;
+}
+
+RENGINE void rengine_cmdbuffer_transition_shader_resources(
+	Diligent::IDeviceContext* context,
+	Diligent::IPipelineState* pipelineState,
+	Diligent::IShaderResourceBinding* shaderResourceBinding
+)
+{
+	if (!context)
+		return;
+	context->TransitionShaderResources(
+		pipelineState,
+		shaderResourceBinding
+	);
+}
+
+RENGINE void rengine_cmdbuffer_set_stencil_ref(
+	Diligent::IDeviceContext* context,
+	u32 stencilRef
+)
+{
+	if (!context)
+		return;
+	context->SetStencilRef(stencilRef);
+}
+
+RENGINE void rengine_cmdbuffer_set_blend_factors(
+	Diligent::IDeviceContext* context,
+	const float* blendFactors
+)
+{
+	if (!context)
+		return;
+	context->SetBlendFactors(blendFactors);
+}
+
+RENGINE void rengine_cmdbuffer_invalidate_state(
+	Diligent::IDeviceContext* context
+)
+{
+	if (context)
+		context->InvalidateState();
+}
+
+RENGINE void rengine_cmdbuffer_next_subpass(
+	Diligent::IDeviceContext* context
+)
+{
+	if (context)
+		context->NextSubpass();
+}
+
+RENGINE void rengine_cmdbuffer_generate_mips(
+	Diligent::IDeviceContext* context,
+	Diligent::ITextureView* textureView
+)
+{
+	if (context)
+		context->GenerateMips(textureView);
+}
+
+RENGINE void rengine_cmdbuffer_transition_resource_states(
+	Diligent::IDeviceContext* context,
+	u32 barrierCount,
+	Diligent::StateTransitionDesc* resourceBarriers
+)
+{
+	if (context)
+		context->TransitionResourceStates(barrierCount, resourceBarriers);
+}
+
+RENGINE void rengine_cmdbuffer_resolve_texture_subresource(
+	Diligent::IDeviceContext* context,
+	Diligent::ITexture* srcTexture,
+	Diligent::ITexture* dstTexture,
+	Diligent::ResolveTextureSubresourceAttribs* resolveAttribs
+)
+{
+	if (context)
+		context->ResolveTextureSubresource(srcTexture, dstTexture, *resolveAttribs);
+}

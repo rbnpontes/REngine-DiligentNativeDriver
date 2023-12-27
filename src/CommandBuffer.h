@@ -121,4 +121,48 @@ RENGINE void rengine_cmdbuffer_insert_dbg_label(
 	string* label,
 	float* color
 );
+RENGINE void rengine_cmdbuffer_begin(
+	Diligent::IDeviceContext* context,
+	u32 immediateCtxId
+);
+RENGINE void rengine_cmdbuffer_finish_frame(
+	Diligent::IDeviceContext* context
+);
+RENGINE Diligent::ICommandList* rengine_cmdbuffer_finish_command_list(
+	Diligent::IDeviceContext* context
+);
+RENGINE void rengine_cmdbuffer_transition_shader_resources(
+	Diligent::IDeviceContext* context,
+	Diligent::IPipelineState* pipelineState,
+	Diligent::IShaderResourceBinding* shaderResourceBinding
+);
+RENGINE void rengine_cmdbuffer_set_stencil_ref(
+	Diligent::IDeviceContext* context,
+	u32 stencilRef
+);
+RENGINE void rengine_cmdbuffer_set_blend_factors(
+	Diligent::IDeviceContext* context,
+	const float* blendFactors
+);
+RENGINE void rengine_cmdbuffer_invalidate_state(
+	Diligent::IDeviceContext* context
+);
+RENGINE void rengine_cmdbuffer_next_subpass(
+	Diligent::IDeviceContext* context
+);
+RENGINE void rengine_cmdbuffer_generate_mips(
+	Diligent::IDeviceContext* context,
+	Diligent::ITextureView* textureView
+);
+RENGINE void rengine_cmdbuffer_transition_resource_states(
+	Diligent::IDeviceContext* context,
+	u32 barrierCount,
+	Diligent::StateTransitionDesc* resourceBarriers
+);
+RENGINE void rengine_cmdbuffer_resolve_texture_subresource(
+	Diligent::IDeviceContext* context,
+	Diligent::ITexture* srcTexture,
+	Diligent::ITexture* dstTexture,
+	Diligent::ResolveTextureSubresourceAttribs* resolveAttribs
+);
 #endif

@@ -74,6 +74,34 @@ RENGINE void rengine_texture_getdesc(
 	output->clear_stencil = desc.ClearValue.DepthStencil.Stencil;
 }
 
+RENGINE void rengine_texture_set_state(
+	Diligent::ITexture* texture,
+	Diligent::RESOURCE_STATE state
+)
+{
+	if (texture)
+		texture->SetState(state);
+}
+
+RENGINE Diligent::RESOURCE_STATE rengine_texture_get_state(
+	Diligent::ITexture* texture
+)
+{
+	if (!texture)
+		return Diligent::RESOURCE_STATE_UNDEFINED;
+	return texture->GetState();
+}
+
+RENGINE u64 rengine_texture_get_gpuhandle(
+	Diligent::ITexture* texture
+)
+{
+	if (!texture)
+		return 0;
+	return texture->GetNativeHandle();
+}
+
+
 RENGINE void rengine_texture_getdefaultview(
 	Diligent::ITexture* texture, 
 	Diligent::TEXTURE_VIEW_TYPE viewType,

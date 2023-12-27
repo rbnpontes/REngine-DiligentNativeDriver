@@ -23,6 +23,16 @@ RENGINE void rengine_texture_getdefaultview(
 	Diligent::TEXTURE_VIEW_TYPE viewType,
 	REngine::Result* result
 );
+RENGINE void rengine_texture_set_state(
+	Diligent::ITexture* texture,
+	Diligent::RESOURCE_STATE state
+);
+RENGINE Diligent::RESOURCE_STATE rengine_texture_get_state(
+	Diligent::ITexture* texture
+);
+RENGINE u64 rengine_texture_get_gpuhandle(
+	Diligent::ITexture* texture
+);
 
 RENGINE void rengine_textureview_getparent(
 	Diligent::ITextureView* texView,

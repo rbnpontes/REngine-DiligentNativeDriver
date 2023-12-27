@@ -7,3 +7,4 @@ out
 /build-windows
 /build-linux
 /build-android
+/build-*

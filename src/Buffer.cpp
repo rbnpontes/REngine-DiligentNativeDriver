@@ -53,3 +53,17 @@ RENGINE Diligent::IBufferView* rengine_buffer_get_default_view(Diligent::IBuffer
 		return null;
 	return buffer->GetDefaultView(viewType);
 }
+
+RENGINE void rengine_buffer_set_state(Diligent::IBuffer* buffer, Diligent::RESOURCE_STATE state)
+{
+	if (buffer == null)
+		return;
+	buffer->SetState(state);
+}
+
+RENGINE Diligent::RESOURCE_STATE rengine_buffer_get_state(const Diligent::IBuffer* buffer)
+{
+	if (buffer == null)
+		return Diligent::RESOURCE_STATE_UNDEFINED;
+	return buffer->GetState();
+}
