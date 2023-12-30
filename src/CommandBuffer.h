@@ -140,10 +140,6 @@ RENGINE void rengine_cmdbuffer_set_stencil_ref(
 	Diligent::IDeviceContext* context,
 	u32 stencilRef
 );
-RENGINE void rengine_cmdbuffer_set_blend_factors(
-	Diligent::IDeviceContext* context,
-	const float* blendFactors
-);
 RENGINE void rengine_cmdbuffer_invalidate_state(
 	Diligent::IDeviceContext* context
 );
@@ -164,5 +160,10 @@ RENGINE void rengine_cmdbuffer_resolve_texture_subresource(
 	Diligent::ITexture* srcTexture,
 	Diligent::ITexture* dstTexture,
 	Diligent::ResolveTextureSubresourceAttribs* resolveAttribs
+);
+RENGINE void rengine_cmdbuffer_exec_command_list(
+	Diligent::IDeviceContext* context,
+	u32 numCommandLists,
+	Diligent::ICommandList** list
 );
 #endif

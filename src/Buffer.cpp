@@ -67,3 +67,10 @@ RENGINE Diligent::RESOURCE_STATE rengine_buffer_get_state(const Diligent::IBuffe
 		return Diligent::RESOURCE_STATE_UNDEFINED;
 	return buffer->GetState();
 }
+
+RENGINE u64 rengine_buffer_get_gpuhandle(Diligent::IBuffer* buffer)
+{
+	if (!buffer)
+		return 0;
+	return buffer->GetNativeHandle();
+}

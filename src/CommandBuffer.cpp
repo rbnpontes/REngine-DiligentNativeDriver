@@ -331,16 +331,6 @@ RENGINE void rengine_cmdbuffer_set_stencil_ref(
 	context->SetStencilRef(stencilRef);
 }
 
-RENGINE void rengine_cmdbuffer_set_blend_factors(
-	Diligent::IDeviceContext* context,
-	const float* blendFactors
-)
-{
-	if (!context)
-		return;
-	context->SetBlendFactors(blendFactors);
-}
-
 RENGINE void rengine_cmdbuffer_invalidate_state(
 	Diligent::IDeviceContext* context
 )
@@ -385,4 +375,15 @@ RENGINE void rengine_cmdbuffer_resolve_texture_subresource(
 {
 	if (context)
 		context->ResolveTextureSubresource(srcTexture, dstTexture, *resolveAttribs);
+}
+
+RENGINE void rengine_cmdbuffer_exec_command_list(
+	Diligent::IDeviceContext* context,
+	u32 numCommandLists,
+	Diligent::ICommandList** list
+)
+{
+	if (!context || numCommandLists ==0 || list == null)
+		return;
+	context->ExecuteCommandLists(numCommandLists, list);
 }
