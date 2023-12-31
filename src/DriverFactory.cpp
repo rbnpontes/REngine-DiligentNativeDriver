@@ -17,13 +17,13 @@
 
 using namespace REngine;
 
-void rengine_fill_create_info(GraphicsDriverSettings* settings, Diligent::EngineCreateInfo* ci) {
+void rengine_fill_create_info(const GraphicsDriverSettings* settings, Diligent::EngineCreateInfo* ci) {
 	ci->NumDeferredContexts = settings->numDeferredCtx;
 	ci->AdapterId = settings->adapterId;
 	ci->EnableValidation = settings->enableValidation;
 }
 #ifdef WIN32
-void rengine_fill_d3d12_create_info(GraphicsDriverSettings* settings, Diligent::EngineD3D12CreateInfo* ci) {
+void rengine_fill_d3d12_create_info(const GraphicsDriverSettings* settings, Diligent::EngineD3D12CreateInfo* ci) {
 	rengine_fill_create_info(settings, ci);
 
 	memcpy(ci->CPUDescriptorHeapAllocationSize, settings->d3d12->cpuDescriptorHeapAllocationSize, sizeof(u32) * 4);
@@ -36,7 +36,7 @@ void rengine_fill_d3d12_create_info(GraphicsDriverSettings* settings, Diligent::
 	ci->NumDynamicHeapPagesToReserve = settings->d3d12->numDynamicHeapPagesToReserve;
 }
 #endif
-void rengine_fill_descriptor_pool_size(VulkanSettings::DescriptorPoolSize* desc, Diligent::VulkanDescriptorPoolSize* output) 
+void rengine_fill_descriptor_pool_size(const VulkanSettings::DescriptorPoolSize* desc, Diligent::VulkanDescriptorPoolSize* output) 
 {
 	output->MaxDescriptorSets = desc->max;
 	output->NumSeparateSamplerDescriptors = desc->sepSm;
@@ -49,7 +49,7 @@ void rengine_fill_descriptor_pool_size(VulkanSettings::DescriptorPoolSize* desc,
 	output->NumInputAttachmentDescriptors = desc->inptAtt;
 	output->NumAccelStructDescriptors = desc->accelSt;
 }
-void rengine_fill_vk_create_info(GraphicsDriverSettings* settings, Diligent::EngineVkCreateInfo* ci) {
+void rengine_fill_vk_create_info(const GraphicsDriverSettings* settings, Diligent::EngineVkCreateInfo* ci) {
 	rengine_fill_create_info(settings, ci);
 
 	memcpy(ci->QueryPoolSizes, settings->vulkan->queryPoolSizes, sizeof(u32) * Diligent::QUERY_TYPE_NUM_TYPES);
@@ -91,19 +91,20 @@ bool rengine_is_valid_window(Diligent::NativeWindow* window) {
 	return window->WindowId != 0 || window->pDisplay != null || window->pXCBConnection != null;
 #elif PLATFORM_MACOS
 	return window->pNSView != null;
-#endif
+#else
 	return false;
+#endif
 }
 
 RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent, Result* result, u32* length) {
 	using namespace Diligent;
-	Diligent::Version graphicsVersion;
+	Diligent::Version graphics_version;
 
 	rengine_stringdb_reset();
 
 #ifdef WIN32
 	if (backend == GraphicsBackend::D3D11 || backend == GraphicsBackend::D3D12)
-		graphicsVersion = Diligent::Version{ 11, 0 };
+		graphics_version = Diligent::Version{ 11, 0 };
 #endif
 
 	if (messageEvent == null) {
@@ -112,7 +113,7 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	}
 
 	IEngineFactory* factory = null;
-	DebugMessageCallbackType callback = reinterpret_cast<DebugMessageCallbackType>(messageEvent);
+	const auto callback = reinterpret_cast<DebugMessageCallbackType>(messageEvent);
 
 	switch (backend)
 	{
@@ -125,11 +126,11 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 		break;
 	case GraphicsBackend::D3D12:
 	{
-		auto d3d12Factory = GetEngineFactoryD3D12();
-		factory = d3d12Factory;
+		const auto d3d12_factory = GetEngineFactoryD3D12();
+		factory = d3d12_factory;
 		factory->SetMessageCallback(callback);
 
-		d3d12Factory->LoadD3D12();
+		d3d12_factory->LoadD3D12();
 	}
 		break;
 #endif
@@ -145,7 +146,9 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 		factory->SetMessageCallback(callback);
 	}
 		break;
-	default:
+	case GraphicsBackend::Unknow:
+	case GraphicsBackend::Metal:
+	case GraphicsBackend::Software:
 		result->error = "Not supported this backend type.";
 		break;
 	}
@@ -153,28 +156,37 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	if (!factory)
 		return;
 
-	u32 adaptersCount = 0;
+	u32 adapters_count = 0;
 	std::vector<GraphicsAdapterInfo> adapters;
-	factory->EnumerateAdapters(graphicsVersion, adaptersCount, nullptr);
-	adapters.resize(adaptersCount);
-	factory->EnumerateAdapters(graphicsVersion, adaptersCount, adapters.data());
+	factory->EnumerateAdapters(graphics_version, adapters_count, nullptr);
+	adapters.resize(adapters_count);
+	factory->EnumerateAdapters(graphics_version, adapters_count, adapters.data());
 
 	factory->Release();
 
-	GraphicsAdapter* finalAdapters = new GraphicsAdapter[adaptersCount];
-	for (u32 i = 0; i < adaptersCount; ++i) {
-		finalAdapters[i].id = i;
-		finalAdapters[i].deviceId = adapters[i].DeviceId;
-		finalAdapters[i].adapterType = (AdapterType)adapters[i].Type;
-		finalAdapters[i].vendorId = adapters[i].VendorId;
-		finalAdapters[i].name = rengine_stringdb_store(adapters[i].Description);
+	const auto final_adapters = new GraphicsAdapter[adapters_count];
+	for (u32 i = 0; i < adapters_count; ++i) {
+		GraphicsAdapter adapter;
+		adapter.id = i;
+		adapter.deviceId = adapters[i].DeviceId;
+		adapter.adapterType = static_cast<AdapterType>(adapters[i].Type);
+		adapter.vendorId = adapters[i].VendorId;
+		adapter.name = rengine_stringdb_store(adapters[i].Description);
+		adapter.localMemory = adapters[i].Memory.LocalMemory;
+		adapter.hostVisibleMemory = adapters[i].Memory.HostVisibleMemory;
+		adapter.unifiedMemory = adapters[i].Memory.UnifiedMemory;
+		adapter.maxMemoryAlloc = adapters[i].Memory.MaxMemoryAllocation;
+		adapter.unifiedMemoryCpuAccess = adapters[i].Memory.UnifiedMemoryCPUAccess;
+		adapter.memoryLessTextureBindFlags = adapters[i].Memory.MemorylessTextureBindFlags;
+
+		final_adapters[i] = adapter;
 	}
 
-	result->value = finalAdapters;
-	*length = adaptersCount;
+	result->value = final_adapters;
+	*length = adapters_count;
 }
 
-RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDesc* desc, Diligent::NativeWindow* nativeWnd, GraphicsDriverResult* result) 
+RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDesc* desc, Diligent::NativeWindow* native_wnd, GraphicsDriverResult* result) 
 {
 	using namespace Diligent;
 
@@ -188,24 +200,24 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 		return;
 	}
 
-	if (desc && nativeWnd == null) {
+	if (desc && native_wnd == null) {
 		result->error = "Native Window is required when SwapChainDesc is present.";
 		return;
 	}
 
-	if (desc && nativeWnd) {
-		if (!rengine_is_valid_window(nativeWnd)) {
+	if (desc && native_wnd) {
+		if (!rengine_is_valid_window(native_wnd)) {
 			result->error = "Native Window is Required when SwapChainDesc is present.";
 			return;
 		}
 	}
 
-	IRenderDevice* renderDevice = null;
-	IDeviceContext** deviceContexts = new IDeviceContext*[settings->numDeferredCtx + 1];
+	IRenderDevice* render_device = null;
+	auto device_contexts = new IDeviceContext*[settings->numDeferredCtx + 1];
 
 	IEngineFactory* factory = null;
 
-	DebugMessageCallbackType callback = reinterpret_cast<DebugMessageCallbackType>(settings->messageCallback);
+	auto callback = reinterpret_cast<DebugMessageCallbackType>(settings->messageCallback);
 
 	switch (settings->backend)
 	{
@@ -218,25 +230,25 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 		if (ci.EnableValidation)
 			ci.SetValidationLevel(VALIDATION_LEVEL_2);
 
-		IEngineFactoryD3D11* engineFactory = GetEngineFactoryD3D11();
-		engineFactory->SetMessageCallback(callback);
+		IEngineFactoryD3D11* engine_factory = GetEngineFactoryD3D11();
+		engine_factory->SetMessageCallback(callback);
 		
-		engineFactory->CreateDeviceAndContextsD3D11(ci, &renderDevice, deviceContexts);
+		engine_factory->CreateDeviceAndContextsD3D11(ci, &render_device, device_contexts);
 		if (desc) {
 			Diligent::SwapChainDesc swapChainDesc;
 			rengine_swapchain_fill_desc(desc, &swapChainDesc);
 
-			engineFactory->CreateSwapChainD3D11(
-				renderDevice,
-				deviceContexts[0],
+			engine_factory->CreateSwapChainD3D11(
+				render_device,
+				device_contexts[0],
 				swapChainDesc,
 				FullScreenModeDesc{},
-				*nativeWnd,
+				*native_wnd,
 				&result->swapChain
 			);
 		}
 
-		factory = engineFactory;
+		factory = engine_factory;
 	}
 		break;
 	case GraphicsBackend::D3D12:
@@ -245,27 +257,27 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 		rengine_fill_d3d12_create_info(settings, &ci);
 		ci.GraphicsAPIVersion = { 11, 0 };
 
-		IEngineFactoryD3D12* engineFactory = GetEngineFactoryD3D12();
-		engineFactory->SetMessageCallback(callback);
-		engineFactory->LoadD3D12();
+		IEngineFactoryD3D12* engine_factory = GetEngineFactoryD3D12();
+		engine_factory->SetMessageCallback(callback);
+		engine_factory->LoadD3D12();
 
-		engineFactory->CreateDeviceAndContextsD3D12(ci, &renderDevice, deviceContexts);
+		engine_factory->CreateDeviceAndContextsD3D12(ci, &render_device, device_contexts);
 
 		if (desc) {
-			Diligent::SwapChainDesc swapChainDesc;
-			rengine_swapchain_fill_desc(desc, &swapChainDesc);
+			Diligent::SwapChainDesc swapchain_desc;
+			rengine_swapchain_fill_desc(desc, &swapchain_desc);
 
-			engineFactory->CreateSwapChainD3D12(
-				renderDevice,
-				deviceContexts[0],
-				swapChainDesc,
+			engine_factory->CreateSwapChainD3D12(
+				render_device,
+				device_contexts[0],
+				swapchain_desc,
 				FullScreenModeDesc{},
-				*nativeWnd,
+				*native_wnd,
 				&result->swapChain
 			);
 		}
 
-		factory = engineFactory;
+		factory = engine_factory;
 	}
 		break;
 #endif
@@ -274,28 +286,29 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 		EngineVkCreateInfo ci;
 		rengine_fill_vk_create_info(settings, &ci);
 
-		const char* const ppIgnoreDebugMessages[] = //
+		// ReSharper disable once CppVariableCanBeMadeConstexpr
+		const char* const ignore_debug_messages[] = //
 			{
 				// Validation Performance Warning: [ UNASSIGNED-CoreValidation-Shader-OutputNotConsumed ]
 				// vertex shader writes to output location 1.0 which is not consumed by fragment shader
 				"UNASSIGNED-CoreValidation-Shader-OutputNotConsumed" //
 			};
-		ci.ppIgnoreDebugMessageNames = ppIgnoreDebugMessages;
-		ci.IgnoreDebugMessageCount   = _countof(ppIgnoreDebugMessages);
+		ci.ppIgnoreDebugMessageNames = ignore_debug_messages;
+		ci.IgnoreDebugMessageCount   = _countof(ignore_debug_messages);
 
-		IEngineFactoryVk* engineFactory = GetEngineFactoryVk();
-		engineFactory->SetMessageCallback(callback);
+		IEngineFactoryVk* engine_factory = GetEngineFactoryVk();
+		engine_factory->SetMessageCallback(callback);
 	
-		engineFactory->CreateDeviceAndContextsVk(ci, &renderDevice, deviceContexts);
+		engine_factory->CreateDeviceAndContextsVk(ci, &render_device, device_contexts);
 		if (desc) {
-			Diligent::SwapChainDesc swapChainDesc;
-			rengine_swapchain_fill_desc(desc, &swapChainDesc);
+			Diligent::SwapChainDesc swapchain_desc;
+			rengine_swapchain_fill_desc(desc, &swapchain_desc);
 
-			engineFactory->CreateSwapChainVk(
-				renderDevice,
-				deviceContexts[0],
-				swapChainDesc,
-				*nativeWnd,
+			engine_factory->CreateSwapChainVk(
+				render_device,
+				device_contexts[0],
+				swapchain_desc,
+				*native_wnd,
 				&result->swapChain
 			);
 		}
@@ -305,33 +318,35 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 	{
 		if (!desc) {
 			result->error = "SwapChain Description is required when Graphics Backend is OpenGL";
-			delete[] deviceContexts;
+			delete[] device_contexts;
 			return;
 		}
 
-		Diligent::SwapChainDesc swapChainDesc;
-		rengine_swapchain_fill_desc(desc, &swapChainDesc);
+		Diligent::SwapChainDesc swapchain_desc;
+		rengine_swapchain_fill_desc(desc, &swapchain_desc);
 
 		EngineGLCreateInfo ci;
 		rengine_fill_create_info(settings, &ci);
 		ci.NumDeferredContexts = 0; // Deferred Context on OpenGL is not supported
-		ci.Window = *nativeWnd;
+		ci.Window = *native_wnd;
 
 		IDeviceContext* immediateCtx;
-		IEngineFactoryOpenGL* engineFactory = GetEngineFactoryOpenGL();
-		engineFactory->SetMessageCallback(callback);
+		IEngineFactoryOpenGL* engine_factory = GetEngineFactoryOpenGL();
+		engine_factory->SetMessageCallback(callback);
 
-		engineFactory->CreateDeviceAndSwapChainGL(
+		engine_factory->CreateDeviceAndSwapChainGL(
 			ci, 
-			&renderDevice, 
-			&immediateCtx, swapChainDesc, &result->swapChain);
+			&render_device, 
+			&immediateCtx, swapchain_desc, &result->swapChain);
 
-		deviceContexts[0] = immediateCtx;
+		device_contexts[0] = immediateCtx;
 
-		factory = engineFactory;
+		factory = engine_factory;
 	}
 		break;
-	default:
+	case GraphicsBackend::Unknow:
+	case GraphicsBackend::Metal:
+	case GraphicsBackend::Software:
 	{
 		result->error = "Not supported this backend type.";
 		return;
@@ -340,64 +355,64 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 
 
 	result->driver = new GraphicsDriver();
-	result->driver->device = renderDevice;
+	result->driver->device = render_device;
 	result->driver->factory = factory;
-	result->driver->contexts = deviceContexts;
+	result->driver->contexts = device_contexts;
 }
 
-RENGINE void rengine_create_swapchain(SwapChainCreationInfo* creationInfo, Result* result)
+RENGINE void rengine_create_swapchain(const SwapChainCreationInfo* creation_info, Result* result)
 {
-	if (!creationInfo->device) {
+	if (!creation_info->device) {
 		result->error = "Device is Required.";
 		return;
 	}
 
-	if (!creationInfo->deviceContext) {
+	if (!creation_info->deviceContext) {
 		result->error = "DeviceContext aka .NET(ICommandBuffer) is required.";
 		return;
 	}
 
-	if (!creationInfo->factory) {
+	if (!creation_info->factory) {
 		result->error = "EngineFactory is required.";
 	}
 
-	if (!creationInfo->swapChainDesc) {
+	if (!creation_info->swapChainDesc) {
 		result->error = "SwapChain Description is Required.";
 		return;
 	}
 
-	if (!creationInfo->window) {
+	if (!creation_info->window) {
 		result->error = "Window is required. How do you think you will create a SwapChain ?";
 		return;
 	}
 
 	Diligent::ISwapChain* swapChain = null;
 	Diligent::SwapChainDesc swapChainDesc;
-	rengine_swapchain_fill_desc(creationInfo->swapChainDesc, &swapChainDesc);
+	rengine_swapchain_fill_desc(creation_info->swapChainDesc, &swapChainDesc);
 	
-	switch (creationInfo->backend)
+	switch (creation_info->backend)
 	{
 #ifdef WIN32
 	case GraphicsBackend::D3D11:
 	{
-		static_cast<Diligent::IEngineFactoryD3D11*>(creationInfo->factory)->CreateSwapChainD3D11(
-			creationInfo->device,
-			creationInfo->deviceContext,
+		dynamic_cast<Diligent::IEngineFactoryD3D11*>(creation_info->factory)->CreateSwapChainD3D11(
+			creation_info->device,
+			creation_info->deviceContext,
 			swapChainDesc,
 			Diligent::FullScreenModeDesc {},
-			*creationInfo->window,
+			*creation_info->window,
 			&swapChain
 		);
 	}
 		break;
 	case GraphicsBackend::D3D12:
 	{
-		static_cast<Diligent::IEngineFactoryD3D12*>(creationInfo->factory)->CreateSwapChainD3D12(
-			creationInfo->device,
-			creationInfo->deviceContext,
+		dynamic_cast<Diligent::IEngineFactoryD3D12*>(creation_info->factory)->CreateSwapChainD3D12(
+			creation_info->device,
+			creation_info->deviceContext,
 			swapChainDesc,
 			Diligent::FullScreenModeDesc {},
-			*creationInfo->window,
+			*creation_info->window,
 			&swapChain
 		);
 	}
@@ -405,17 +420,22 @@ RENGINE void rengine_create_swapchain(SwapChainCreationInfo* creationInfo, Resul
 #endif
 	case GraphicsBackend::Vulkan:
 	{
-		static_cast<Diligent::IEngineFactoryVk*>(creationInfo->factory)->CreateSwapChainVk(
-			creationInfo->device,
-			creationInfo->deviceContext,
+		dynamic_cast<Diligent::IEngineFactoryVk*>(creation_info->factory)->CreateSwapChainVk(
+			creation_info->device,
+			creation_info->deviceContext,
 			swapChainDesc,
-			*creationInfo->window,
+			*creation_info->window,
 			&swapChain
 		);
 	}
 		break;
 	case GraphicsBackend::OpenGL:
 		result->error = "Not supported SwapChain creation on OpenGL backend.";
+		break;
+	case GraphicsBackend::Unknow:
+	case GraphicsBackend::Metal:
+	case GraphicsBackend::Software:
+		result->error = "Not supported this Graphics backend.";
 		break;
 	}
 

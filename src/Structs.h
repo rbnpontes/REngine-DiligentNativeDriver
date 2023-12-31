@@ -96,6 +96,12 @@ namespace REngine
 		u32 deviceId;
 		string* name;
 		AdapterType adapterType;
+		u64 localMemory;
+		u64 hostVisibleMemory;
+		u64 unifiedMemory;
+		u64 maxMemoryAlloc;
+		u8 unifiedMemoryCpuAccess;
+		u32 memoryLessTextureBindFlags;
 	};
 
 	struct GraphicsDriver {

@@ -27,5 +27,6 @@ void rengine_stringdb_reset()
 
 RENGINE void rengine_stringdb_free()
 {
+	g_next = 0;
 	g_strings.clear();
 }
