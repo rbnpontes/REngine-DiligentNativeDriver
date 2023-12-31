@@ -39,7 +39,7 @@ RENGINE void rengine_buffer_create_view(Diligent::IBuffer* buffer, REngine::Buff
 	desc.ByteOffset = createDesc->byteOffset;
 	desc.ByteWidth = createDesc->byteWidth;
 
-	Diligent::IBufferView* view;
+	Diligent::IBufferView* view = null;
 	buffer->CreateView(desc, &view);
 
 	result->value = view;
