@@ -1,7 +1,6 @@
 cmake_minimum_required (VERSION 3.6)
 
 project(REngine-DiligentNativeDriver CXX)
-
 add_subdirectory(DiligentCore)
 
 file (GLOB SOURCE_FILES src/*.cpp src/*.h)

@@ -6,7 +6,9 @@
 #include <EngineFactoryD3D11.h>
 #endif
 
-#include <EngineFactoryVk.h>
+#ifndef __EMSCRIPTEN__
+	#include <EngineFactoryVk.h>
+#endif
 #include <EngineFactoryOpenGL.h>
 
 #include <vector>
@@ -49,6 +51,8 @@ void rengine_fill_descriptor_pool_size(const VulkanSettings::DescriptorPoolSize*
 	output->NumInputAttachmentDescriptors = desc->inptAtt;
 	output->NumAccelStructDescriptors = desc->accelSt;
 }
+
+#ifndef __EMSCRIPTEN__
 void rengine_fill_vk_create_info(const GraphicsDriverSettings* settings, Diligent::EngineVkCreateInfo* ci) {
 	rengine_fill_create_info(settings, ci);
 
@@ -79,6 +83,7 @@ void rengine_fill_vk_create_info(const GraphicsDriverSettings* settings, Diligen
 	ci->DynamicHeapSize = settings->vulkan->dynamicHeapSize;
 	ci->DynamicHeapPageSize = settings->vulkan->dynamicHeapPageSize;
 }
+#endif
 
 bool rengine_is_valid_window(Diligent::NativeWindow* window) {
 #ifdef PLATFORM_WIN32
@@ -134,12 +139,14 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	}
 		break;
 #endif
+#ifndef __EMSCRIPTEN__
 	case GraphicsBackend::Vulkan:
 	{
 		factory = GetEngineFactoryVk();
 		factory->SetMessageCallback(callback);
 	}
 		break;
+#endif
 	case GraphicsBackend::OpenGL:
 	{
 		factory = GetEngineFactoryOpenGL();
@@ -281,6 +288,7 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 	}
 		break;
 #endif
+#ifndef __EMSCRIPTEN__
 	case GraphicsBackend::Vulkan:
 	{
 		EngineVkCreateInfo ci;
@@ -314,6 +322,7 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 		}
 	}
 		break;
+#endif
 	case GraphicsBackend::OpenGL:
 	{
 		if (!desc) {
@@ -418,6 +427,7 @@ RENGINE void rengine_create_swapchain(const SwapChainCreationInfo* creation_info
 	}
 		break;
 #endif
+#ifndef __EMSCRIPTEN__
 	case GraphicsBackend::Vulkan:
 	{
 		dynamic_cast<Diligent::IEngineFactoryVk*>(creation_info->factory)->CreateSwapChainVk(
@@ -429,6 +439,7 @@ RENGINE void rengine_create_swapchain(const SwapChainCreationInfo* creation_info
 		);
 	}
 		break;
+#endif
 	case GraphicsBackend::OpenGL:
 		result->error = "Not supported SwapChain creation on OpenGL backend.";
 		break;

@@ -24,12 +24,15 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+
 #if defined(_MSC_VER)
-typedef unsigned long long u64;
+    typedef unsigned long long u64;
+#elif defined(__EMSCRIPTEN__)
+    typedef unsigned long long u64;
 #elif defined(ANDROID)
-typedef uint64_t u64;
+    typedef uint64_t u64;
 #elif defined(__GNUC__)
-typedef long unsigned int u64;
+    typedef long unsigned int u64;
 #endif
 typedef const char string;
 typedef int	boolean;
