@@ -38,6 +38,7 @@ void rengine_fill_d3d12_create_info(const GraphicsDriverSettings* settings, Dili
 	ci->NumDynamicHeapPagesToReserve = settings->d3d12->numDynamicHeapPagesToReserve;
 }
 #endif
+#ifndef __EMSCRIPTEN__
 void rengine_fill_descriptor_pool_size(const VulkanSettings::DescriptorPoolSize* desc, Diligent::VulkanDescriptorPoolSize* output) 
 {
 	output->MaxDescriptorSets = desc->max;
@@ -52,7 +53,6 @@ void rengine_fill_descriptor_pool_size(const VulkanSettings::DescriptorPoolSize*
 	output->NumAccelStructDescriptors = desc->accelSt;
 }
 
-#ifndef __EMSCRIPTEN__
 void rengine_fill_vk_create_info(const GraphicsDriverSettings* settings, Diligent::EngineVkCreateInfo* ci) {
 	rengine_fill_create_info(settings, ci);
 
@@ -96,6 +96,8 @@ bool rengine_is_valid_window(Diligent::NativeWindow* window) {
 	return window->WindowId != 0 || window->pDisplay != null || window->pXCBConnection != null;
 #elif PLATFORM_MACOS
 	return window->pNSView != null;
+#elif PLATFORM_EMSCRIPTEN
+	return window->pCanvasId != null;
 #else
 	return false;
 #endif

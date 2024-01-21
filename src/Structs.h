@@ -37,7 +37,7 @@ namespace REngine
 	};
 
 #endif
-
+#ifndef __EMSCRIPTEN__
 	struct VulkanSettings {
 		struct DescriptorPoolSize {
 			u32 max;
@@ -76,12 +76,14 @@ namespace REngine
 
 		u32* queryPoolSizes;
 	};
-
+#endif
 	struct GraphicsDriverSettings {
 #ifdef WIN32
 		D3D12Settings* d3d12;
 #endif
+#ifndef __EMSCRIPTEN__
 		VulkanSettings* vulkan;
+#endif
 		boolean enableValidation;
 		GraphicsBackend backend;
 

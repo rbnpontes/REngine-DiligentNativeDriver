@@ -1,5 +1,8 @@
 #pragma once
 #include <stdint.h>
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+#endif
 
 #ifdef ENGINE_DLL
 #undef ENGINE_DLL
@@ -12,7 +15,12 @@
 #else
 #endif
 
+#if defined(__EMSCRIPTEN__)
+#define RENGINE extern "C" EMSCRIPTEN_KEEPALIVE
+#else
 #define RENGINE extern "C" RENGINE_API
+#endif
+
 
 #ifdef _DEBUG
 #define RENGINE_DEBUG
