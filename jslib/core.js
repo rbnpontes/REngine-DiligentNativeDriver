@@ -41,7 +41,7 @@ function read(memAddr, type) {
         () => Boolean(_module.HEAPU32[_idx]),
         () => _module.HEAPU32[_idx],
         () => _module.HEAPU32[_idx],
-        () => _module.UTF8ToString(_module.HEAPU32[_idx])
+        () => getString(memAddr)
     ];
 
     const call = _type < calls.length ? calls[_type] : () => void (0);
@@ -100,11 +100,38 @@ function readInstructions(instructions, memAddr) {
     });
 }
 
+/**
+ * read string from pointer
+ * @param {number} strPtr 
+ * @returns {string}
+ */
+function getString(strPtr) {
+    const module = getModule();
+    return module.UTF8ToString(module.HEAPU32[strPtr >> 2]);
+}
+
+/**
+ * set a value on whole memory
+ * @param {number} ptr memory address
+ * @param {number} size memory size
+ * @param {number} value memory value
+ */ 
+function memset(ptr, size, value) {
+    const maxValue = ptr + size;
+    const module = getModule();
+    while(ptr < maxValue) {
+        module.HEAP8[(ptr >> 0)] = value;
+        ++ptr;
+    }
+}
+
 module.exports = {
     sizeof,
     getPtrSize,
     read,
     write,
     writeInstructions,
-    readInstructions
+    readInstructions,
+    getString,
+    memset
 };

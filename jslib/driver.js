@@ -154,7 +154,7 @@ function createDriver(creationDesc) {
     const swapChain = new SwapChain(result.swapChain);
 
     const commandBuffer = new CommandBuffer(module.getValue(rawDriver.context, '*'));
-    const device = new Device(module.getValue(rawDriver.device, '*'));
+    const device = new Device(rawDriver.device);
 
     return [
         new EngineDriver(commandBuffer, device, module.getValue(rawDriver.factory, '*'), [

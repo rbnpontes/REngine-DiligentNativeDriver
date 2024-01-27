@@ -195,6 +195,27 @@ const ClearDepthStencil = Object.seal({
     stencil : 0x2 
 });
 
+const ShaderType = Object.seal({
+    vertex      : 0,
+    pixel       : 1,
+    compute     : 2,
+    geometry    : 3,
+    hull        : 4,
+    domain      : 5,
+    unknow      : 6
+});
+
+const ShaderTypeFlags = Object.seal({
+    none            : 0,
+    vertex          : 1 << 0,
+    pixel           : 1 << 1,
+    compute         : 1 << 2,
+    geometry        : 1 << 3,
+    hull            : 1 << 4,
+    domain          : 1 << 5,
+    vertexAndPixel  : 1 << 0 | 1 << 1
+});
+
 module.exports = {
     TextureFormat,
     SwapChainUsage,
@@ -206,5 +227,7 @@ module.exports = {
     Usage,
     CpuAccessFlags,
     TextureFlags,
-    ClearDepthStencil
+    ClearDepthStencil,
+    ShaderType,
+    ShaderTypeFlags
 };

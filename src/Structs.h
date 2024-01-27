@@ -198,6 +198,7 @@ namespace REngine
 
 	struct ShaderCreateInfoDTO {
 		string* name;
+		RENGINE_ALIGN
 		ShaderType type;
 		string* sourceCode;
 		u8* byteCode;
