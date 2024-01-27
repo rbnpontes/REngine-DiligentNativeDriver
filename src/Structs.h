@@ -84,7 +84,9 @@ namespace REngine
 #ifndef __EMSCRIPTEN__
 		VulkanSettings* vulkan;
 #endif
+		RENGINE_ALIGN
 		boolean enableValidation;
+		RENGINE_ALIGN
 		GraphicsBackend backend;
 
 		u32 adapterId;
@@ -126,8 +128,9 @@ namespace REngine
 	struct SwapChainDesc {
 		u32 width;
 		u32 height;
-
+		RENGINE_ALIGN
 		u16 colorFormat;
+		RENGINE_ALIGN
 		u16 depthFormat;
 
 		u32 usage;
@@ -135,7 +138,9 @@ namespace REngine
 
 		u32 bufferCount;
 		float defaultDepthValue;
+		RENGINE_ALIGN
 		u8 defaultStencilValue;
+		RENGINE_ALIGN
 		boolean isPrimary;
 	};
 
@@ -328,14 +333,19 @@ namespace REngine
 	};
 
 	struct TextureViewDesc {
+		RENGINE_ALIGN
 		Diligent::TEXTURE_VIEW_TYPE viewType;
+		RENGINE_ALIGN
 		Diligent::RESOURCE_DIMENSION dimension;
+		RENGINE_ALIGN
 		Diligent::TEXTURE_FORMAT format;
 		u32 mostDetailedMip;
 		u32 mipLevels;
 		u32 firstSlice;
 		u32 slicesCount;
+		RENGINE_ALIGN
 		Diligent::UAV_ACCESS_FLAG accessFlags;
+		RENGINE_ALIGN
 		u8 allowMipMapGeneration;
 	};
 

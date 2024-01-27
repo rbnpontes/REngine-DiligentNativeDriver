@@ -103,6 +103,7 @@ bool rengine_is_valid_window(Diligent::NativeWindow* window) {
 #endif
 }
 
+#ifndef __EMSCRIPTEN__
 RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messageEvent, Result* result, u32* length) {
 	using namespace Diligent;
 	Diligent::Version graphics_version;
@@ -194,6 +195,7 @@ RENGINE void rengine_get_available_adapter(GraphicsBackend backend, void* messag
 	result->value = final_adapters;
 	*length = adapters_count;
 }
+#endif
 
 RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDesc* desc, Diligent::NativeWindow* native_wnd, GraphicsDriverResult* result) 
 {
@@ -364,13 +366,13 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 	}
 	}
 
-
 	result->driver = new GraphicsDriver();
 	result->driver->device = render_device;
 	result->driver->factory = factory;
 	result->driver->contexts = device_contexts;
 }
 
+#ifndef __EMSCRIPTEN__
 RENGINE void rengine_create_swapchain(const SwapChainCreationInfo* creation_info, Result* result)
 {
 	if (!creation_info->device) {
@@ -454,3 +456,5 @@ RENGINE void rengine_create_swapchain(const SwapChainCreationInfo* creation_info
 
 	result->value = swapChain;
 }
+#endif
+

@@ -26,6 +26,16 @@
 #define RENGINE_DEBUG
 #endif
 
+#ifndef RENGINE_ALIGN
+
+    #if defined (__EMSCRIPTEN__)
+        #define RENGINE_ALIGN alignas(4)
+    #else
+        #define RENGINE_ALIGN
+    #endif
+
+#endif
+
 
 #define null nullptr
 
