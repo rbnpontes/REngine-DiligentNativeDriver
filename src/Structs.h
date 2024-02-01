@@ -223,7 +223,9 @@ namespace REngine
 		u32 bufferStride;
 		u32 elementOffset;
 		u32 instanceStepRate;
+		RENGINE_ALIGN
 		ElementType elementType;
+		RENGINE_ALIGN
 		u8 normalized;
 	};
 
@@ -243,50 +245,83 @@ namespace REngine
 
 	struct ImmutableSamplerDesc {
 		string* name;
+		RENGINE_ALIGN
 		TextureFilterMode sampler_filterMode;
+		RENGINE_ALIGN
 		u8 sampler_anisotropy;
+		RENGINE_ALIGN
 		u8 sampler_shadowCmp;
+		RENGINE_ALIGN
 		TextureAddressMode sampler_addressMode_u;
+		RENGINE_ALIGN
 		TextureAddressMode sampler_addressMode_v;
+		RENGINE_ALIGN
 		TextureAddressMode sampler_addressMode_w;
 	};
 
 	struct GraphicsPipelineDescDTO {
 		string* name;
 
+		RENGINE_ALIGN
 		u8 blendState_colorWriteEnabled;
+		RENGINE_ALIGN
 		u8 blendState_blendMode;
+		RENGINE_ALIGN
 		u8 blendState_alphaToCoverage;
-
+		
+		RENGINE_ALIGN
 		u8 rasterizerState_fillMode;
+		RENGINE_ALIGN
 		u8 rasterizerState_cullMode;
 		float rasterizerState_constantDepthBias;
 		float rasterizerState_slopeScaledDepthBias;
+		RENGINE_ALIGN
 		u8 rasterizerState_scissorTestEnabled;
+		RENGINE_ALIGN
 		u8 rasterizerState_lineAntiAlias;
 
+		RENGINE_ALIGN
 		u8 depthStencilState_enableDepth;
+		RENGINE_ALIGN
 		u8 depthStencilState_depthWriteEnabled;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilTestEnabled;
+		RENGINE_ALIGN
 		u8 depthStencilState_depthCmpFunc;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilCmpFunc;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilOpOnPassed;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilOpOnStencilFailed;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilOpOnDepthFailed;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilCmpMask;
+		RENGINE_ALIGN
 		u8 depthStencilState_stencilWriteMask;
 
+		RENGINE_ALIGN
 		u8 primitiveType;
 
 		PipelineInputLayoutElementDesc* inputLayouts;
+		RENGINE_ALIGN
 		u8 numInputLayouts;
 
+		RENGINE_ALIGN
 		u16 output_depthStencilFormat;
+#if defined(__EMSCRIPTEN__)
+		u32* output_rtFormats;
+#else
 		u16* output_rtFormats;
+#endif
+		RENGINE_ALIGN
 		u8 output_numRtFormats;
+		RENGINE_ALIGN
 		u8 output_multiSample;
 
 		ImmutableSamplerDesc* immutableSamplers;
+		RENGINE_ALIGN
 		u8 numImmutableSamplers;
 
 		Diligent::IShader* shader_vs;
@@ -368,4 +403,13 @@ namespace REngine
 		u64 byteOffset;
 		u64 byteWidth;
 	};
+#if defined(__EMSCRIPTEN__)
+	struct WebDrawArgs
+	{
+		u32 numVertices;
+		u32 numInstances;
+		u32 startVertexLocation;
+		u32 firstInstanceLocation;
+	};
+#endif
 }

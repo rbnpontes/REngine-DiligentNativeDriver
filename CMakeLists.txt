@@ -29,17 +29,17 @@ if (EMSCRIPTEN)
     )
 
     # Add browserify build command
-    add_custom_command(
-        TARGET REngine-DiligentNativeDriver
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "Bundle Engine Script..."
-        COMMAND npx browserify --debug -r ./REngine-DiligentNativeDriver.js:librengine-module.js > ./output/librengine-module.js
-        COMMAND npx browserify -x librengine-module.js --debug ./jslib/rengine.js > ./output/librengine.js
-        COMMAND ${CMAKE_COMMAND} -E echo "Finish Script Bundle."
-        COMMAND ${CMAKE_COMMAND} -E echo "Copying WASM file"
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/REngine-DiligentNativeDriver.wasm  ${CMAKE_CURRENT_BINARY_DIR}/output
-        COMMAND ${CMAKE_COMMAND} -E echo "Finish"
-    )
+    # add_custom_command(
+    #     TARGET REngine-DiligentNativeDriver
+    #     POST_BUILD
+    #     COMMAND ${CMAKE_COMMAND} -E echo "Bundle Engine Script..."
+    #     COMMAND npx browserify --debug -r ./REngine-DiligentNativeDriver.js:librengine-module.js > ./output/librengine-module.js
+    #     COMMAND npx browserify -x librengine-module.js --debug ./jslib/rengine.js > ./output/librengine.js
+    #     COMMAND ${CMAKE_COMMAND} -E echo "Finish Script Bundle."
+    #     COMMAND ${CMAKE_COMMAND} -E echo "Copying WASM file"
+    #     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/REngine-DiligentNativeDriver.wasm  ${CMAKE_CURRENT_BINARY_DIR}/output
+    #     COMMAND ${CMAKE_COMMAND} -E echo "Finish"
+    # )
 endif()
 
 if (WIN32)
@@ -55,6 +55,7 @@ if (EMSCRIPTEN)
         PRIVATE
         -g
         -sWASM=1
+        -sEXPORT_ES6=1
         -sMODULARIZE
         -sALLOW_TABLE_GROWTH=1
         -sNO_EXIT_RUNTIME=1

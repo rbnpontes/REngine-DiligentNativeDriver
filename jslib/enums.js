@@ -1,4 +1,4 @@
-const TextureFormat = Object.seal({
+const TextureFormat = Object.freeze({
     unknown                 : 0,
     rgba32Typeless          : 1,
     rgba32Float             : 2,
@@ -101,7 +101,7 @@ const TextureFormat = Object.seal({
     bc7UNormSRGB            : 99,
 });
 
-const SwapChainUsage = Object.seal({
+const SwapChainUsage = Object.freeze({
     none                : 0x0,
     renderTarget        : 0x1,
     shaderResource      : 0x2,
@@ -109,7 +109,7 @@ const SwapChainUsage = Object.seal({
     copySource          : 0x8
 });
 
-const SwapChainTransform = Object.seal({
+const SwapChainTransform = Object.freeze({
     optimal                     : 0,
     identity                    : 1,
     rotate90                    : 2,
@@ -121,7 +121,7 @@ const SwapChainTransform = Object.seal({
     horizontalMirrorRotate270   : 8
 })
 
-const TextureViewType = Object.seal({
+const TextureViewType = Object.freeze({
     undef               : 0,
     shaderResource      : 1,
     renderTarget        : 2,
@@ -131,7 +131,7 @@ const TextureViewType = Object.seal({
     shadingRate         : 6
 });
 
-const ResourceDimension = Object.seal({
+const ResourceDimension = Object.freeze({
     undef           : 0,
     buffer          : 1,
     tex1D           : 2,
@@ -143,14 +143,14 @@ const ResourceDimension = Object.seal({
     texCubeArray    : 8
 });
 
-const UavAccessFlag = Object.seal({
+const UavAccessFlag = Object.freeze({
     unspecified     : 0x0,
     read            : 0x01,
     write           : 0x02,
     readWrite       : 0x01 | 0x02
 });
 
-const BindFlags = Object.seal({
+const BindFlags = Object.freeze({
     none                : 0x0,
     VertexBuffer        : 1 << 0,
     IndexBuffer         : 1 << 1,
@@ -166,7 +166,7 @@ const BindFlags = Object.seal({
     ShadingRate         : 1 << 11
 });
 
-const Usage = Object.seal({
+const Usage = Object.freeze({
     immutable   : 0,
     default     : 1,
     dynamic     : 2,
@@ -175,27 +175,27 @@ const Usage = Object.seal({
     sparse      : 5
 });
 
-const CpuAccessFlags = Object.seal({
+const CpuAccessFlags = Object.freeze({
     none : 0,
     read : 1 << 0,
     write : 1 << 1
 });
 
-const TextureFlags = Object.seal({
+const TextureFlags = Object.freeze({
     none            : 0,
     generateMip     : 1 << 0,
     memoryLess      : 1 << 1,
-    sparseAliasing  : 1 << 2,
+    sparfreezeiasing  : 1 << 2,
     subSampled      : 1 << 3
 });
 
-const ClearDepthStencil = Object.seal({
+const ClearDepthStencil = Object.freeze({
     none : 0x0,
     depth : 0x1,
     stencil : 0x2 
 });
 
-const ShaderType = Object.seal({
+const ShaderType = Object.freeze({
     vertex      : 0,
     pixel       : 1,
     compute     : 2,
@@ -205,7 +205,7 @@ const ShaderType = Object.seal({
     unknow      : 6
 });
 
-const ShaderTypeFlags = Object.seal({
+const ShaderTypeFlags = Object.freeze({
     none            : 0,
     vertex          : 1 << 0,
     pixel           : 1 << 1,
@@ -214,6 +214,89 @@ const ShaderTypeFlags = Object.seal({
     hull            : 1 << 4,
     domain          : 1 << 5,
     vertexAndPixel  : 1 << 0 | 1 << 1
+});
+
+const PrimitiveType = Object.freeze({
+    triangleList    : 0,
+    lineLine        : 1,
+    pointList       : 2,
+    triangleStrip   : 3,
+    lineStrip       : 4
+});
+
+const BlendMode = Object.freeze({
+    replace         : 0,
+    add             : 1,
+    multiply        : 2,
+    alpha           : 3,
+    addAlpha        : 4,
+    preMulAlpha     : 5,
+    invDestAlpha    : 6,
+    subtract        : 7,
+    subtractAlpha   : 8,
+    deferredDecal   : 9
+});
+
+const CompareMode = Object.freeze({
+    always      : 0,
+    equal       : 1,
+    notEqual    : 2,
+    less        : 3,
+    lessEqual   : 4,
+    greater     : 5,
+    greaterEqual: 6
+});
+
+const CullMode = Object.freeze({
+    both    : 0,
+    back    : 1,
+    front   : 2
+});
+
+const FillMode = Object.freeze({
+    solid       : 0,
+    wireFrame   : 1
+});
+
+const StencilOp = Object.freeze({
+    keep    : 0,
+    zero    : 1,
+    ref     : 2,
+    incr    : 3,
+    decr    : 4
+});
+
+const PipelineType = Object.freeze({
+    graphics    : 0,
+    compute     : 1,
+    mesh        : 2,
+    rayTracing  : 3,
+    tile        : 4,
+    unknow      : 5
+});
+
+const ElementType = Object.freeze({
+    int: 0,
+    float: 1,
+    vector2: 2,
+    vector3: 3,
+    vector4: 4,
+    uByte4: 5,
+    uByte4Norm: 6
+});
+
+const TextureFilterMode = Object.freeze({
+   nearest              : 0, 
+   bilinear             : 1,
+   trilinear            : 2,
+   anisotropic          : 3,
+   nearestAnisotropic   : 4
+});
+
+const TextureAddressMode = Object.freeze({
+    wrap    : 0,
+    mirror  : 1,
+    clamp   : 2
 });
 
 module.exports = {
@@ -229,5 +312,15 @@ module.exports = {
     TextureFlags,
     ClearDepthStencil,
     ShaderType,
-    ShaderTypeFlags
+    ShaderTypeFlags,
+    PrimitiveType,
+    BlendMode,
+    CompareMode,
+    CullMode,
+    FillMode,
+    StencilOp,
+    PipelineType,
+    ElementType,
+    TextureFilterMode,
+    TextureAddressMode
 };

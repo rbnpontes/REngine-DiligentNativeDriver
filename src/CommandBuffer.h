@@ -24,10 +24,19 @@ RENGINE void rengine_cmdbuffer_copy_tex(
 	REngine::CopyTextureInfoDTO* copyInfo,
 	u8 isDeferred
 );
+#if defined(__EMSCRIPTEN__)
+RENGINE void rengine_cmdbuffer_draw(
+	Diligent::IDeviceContext* context,
+	REngine::WebDrawArgs* drawArgs
+);
+#else
 RENGINE void rengine_cmdbuffer_draw(
 	Diligent::IDeviceContext* context,
 	Diligent::DrawAttribs* drawAttribs
 );
+#endif
+
+
 RENGINE void rengine_cmdbuffer_drawindexed(
 	Diligent::IDeviceContext* context,
 	Diligent::DrawIndexedAttribs* drawAttribs

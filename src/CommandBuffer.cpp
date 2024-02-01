@@ -78,6 +78,23 @@ RENGINE void rengine_cmdbuffer_copy_tex(
 	context->CopyTexture(texAttribs);
 }
 
+#if defined(__EMSCRIPTEN__)
+RENGINE void rengine_cmdbuffer_draw(
+	Diligent::IDeviceContext* context,
+	REngine::WebDrawArgs* drawArgs
+)
+{
+	if (!context)
+		return;
+	Diligent::DrawAttribs attribs;
+	attribs.Flags = Diligent::DRAW_FLAG_VERIFY_ALL;
+	attribs.NumVertices = drawArgs->numVertices;
+	attribs.NumInstances = drawArgs->numInstances;
+	attribs.StartVertexLocation = drawArgs->startVertexLocation;
+	attribs.FirstInstanceLocation = drawArgs->firstInstanceLocation;
+	context->Draw(attribs);
+}
+#else
 RENGINE void rengine_cmdbuffer_draw(
 	Diligent::IDeviceContext* context,
 	Diligent::DrawAttribs* drawAttribs
@@ -87,6 +104,7 @@ RENGINE void rengine_cmdbuffer_draw(
 		return;
 	context->Draw(*drawAttribs);
 }
+#endif
 
 RENGINE void rengine_cmdbuffer_drawindexed(
 	Diligent::IDeviceContext* context,

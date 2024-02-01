@@ -1,5 +1,5 @@
 const { CommandBuffer } = require("./command-buffer");
-const { getPtrSize, write, writeInstructions, readInstructions } = require("./core");
+const { getPtrSize, write, writeInstructions, readInstructions, uint } = require("./core");
 const { Device } = require("./device");
 const { getModule } = require("./native-module");
 const { ObjectRegistry } = require("./object-registry");
@@ -78,7 +78,7 @@ function _onMessageCallback(severity, messagePtr, messageFunc, messageFile, line
  */
 function createDriverSettingsPtr(settings) {
     const module = getModule();
-    const maxUintValue = Math.pow(2, 32) - 1;
+    const maxUintValue = uint.max;
     const ptr = module._malloc(5 * getPtrSize());
     const messageCallbackPtr = module.addFunction(_onMessageCallback.bind(settings), 'viiiii');
 
@@ -145,7 +145,7 @@ function createDriver(creationDesc) {
     module._rengine_create_driver(settingsPtr, swapChainDescPtr, nativeWindow.handle, driverResultPtr);
     const result = readDriverResult(driverResultPtr);
 
-    if (result.error != '') {
+    if (result.error) {
         freeResources();
         throw new Error('[Driver]: ' + result.error);
     }

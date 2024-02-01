@@ -1,4 +1,5 @@
 const { getModule } = require("./native-module");
+const { PipelineState, getNullPipelineState, createGraphicsPipelineDescPtr } = require("./pipeline-state");
 const { Result } = require("./result");
 const { ShaderCreateInfo, createShaderCiPtr, getNullShader, Shader } = require("./shader");
 
@@ -37,9 +38,37 @@ class Device {
 
         if(result.error)
             throw new Error(result.error);
-        if(result.ptr == 0)
+        if(result.value == 0)
             throw new Error('Could not possible to create shader. Value: null');
         return new Shader(result.value, createInfo);
+    }
+
+    /**
+     * 
+     * @param {GraphicsPipelineDesc} pipelineDesc 
+     * @returns {PipelineState} return a pipeline state
+     */
+    createPipelineState(pipelineDesc) {
+        if(this.disposed || !pipelineDesc)
+            return getNullPipelineState();
+        const [pipelineDescPtr, disposableCall] = createGraphicsPipelineDescPtr(pipelineDesc);
+        const result = new Result();
+        getModule()._rengine_device_create_graphicspipeline(
+            this.handle,
+            pipelineDescPtr,
+            0x1,
+            result.getResultPtr()
+        );
+
+        result.load();
+        result.dispose();
+        disposableCall();
+
+        if(result.error)
+            throw new Error(result.error);
+        if(result.value == 0)
+            throw new Error('Could not possible to create pipeline state. Value: null');
+        return new PipelineState(result.value, pipelineDesc);
     }
 }
 

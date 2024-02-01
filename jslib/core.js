@@ -25,15 +25,10 @@ function sizeof(type) {
     return Object.keys(instance).length * getPtrSize();
 }
 
-/**
- * read memory address
- * @param {number} memAddr 
- * @param {keyof NativeType} type 
- */
-function read(memAddr, type) {
+function _readCall(memAddr, type, module) {
     const _type = NativeType[type];
     const _idx = memAddr >> 2;
-    const _module = getModule();
+    const _module = module ?? getModule();
     const calls = [
         () => _module.HEAP32[_idx],
         () => _module.HEAPU32[_idx],
@@ -44,20 +39,23 @@ function read(memAddr, type) {
         () => getString(memAddr)
     ];
 
-    const call = _type < calls.length ? calls[_type] : () => void (0);
-    return call();
+    return _type < calls.length ? calls[_type] : () => void (0);
 }
 
 /**
- * write memory address
+ * read memory address
  * @param {number} memAddr 
- * @param {*} value 
  * @param {keyof NativeType} type 
  */
-function write(memAddr, value, type) {
+function read(memAddr, type) {
+    return _readCall(memAddr, type)();
+}
+
+
+function _writeCall(memAddr, type, module) {
     const _type = NativeType[type];
     const _idx = memAddr >> 2;
-    const _module = getModule();
+    const _module = module ?? getModule();
     const calls = [
         (x) => _module.HEAP32[_idx] = x,
         (x) => _module.HEAPU32[_idx] = x,
@@ -69,6 +67,16 @@ function write(memAddr, value, type) {
     ];
 
     const call = _type < calls.length ? calls[_type] : () => void (0);
+    return call;
+}
+/**
+ * write memory address
+ * @param {number} memAddr 
+ * @param {*} value 
+ * @param {keyof NativeType} type 
+ */
+function write(memAddr, value, type) {
+    const call = _writeCall(memAddr, type);
     call(value);
 }
 
@@ -89,6 +97,41 @@ function writeInstructions(instructions, memAddr) {
     });
 }
 
+/**
+ * Works on the same way of @type {writeInstructions}
+ * But instead of resolve types at each call
+ * This compile method resolves this types into a single
+ * optimized call.
+ * Note: you still pay the process of build, this is recommended
+ * if you wan't call multiple times.
+ * If you are running this code under V8, then V8 can optimize this
+ * call in a low level.
+ * @param {[Function, keyof NativeType][]} instructions 
+ * @param {number} memAddr 
+ */
+function compileWriteInstructions(instructions, memAddr) {
+    if(!Array.isArray(instructions))
+        return ()=> void(0);
+    const module = getModule();
+    const calls = instructions.map((pair, idx)=> {
+        const [call, type] = pair;
+        const instWriteCall = _writeCall(memAddr + (idx * getPtrSize()), type, module);
+        return ()=> instWriteCall(call());
+    });
+    return ()=> {
+        let i = calls.length - 1;
+        while(i >= 0){
+            calls[i]();
+            --i;
+        }
+    };
+}
+
+/**
+ * helper method used to read a memory address from an list of instructions
+ * @param {[Function, keyof NativeType][]} instructions 
+ * @param {number} memAddr
+ */
 function readInstructions(instructions, memAddr) {
     if (!Array.isArray(instructions))
         return;
@@ -101,6 +144,34 @@ function readInstructions(instructions, memAddr) {
 }
 
 /**
+ * this method works in the same way of @type {readInstructions}
+ * But instead of resolve types at each read call
+ * This method resolves first all dependencies to make
+ * an optimized call, ideal if you need to read a memory address
+ * multiple times
+ * @param {*} instructions 
+ * @param {*} memAddr 
+ * @returns 
+ */
+function compileReadInstructions(instructions, memAddr) {
+    if(!Array.isArray(instructions))
+        return ()=> void(0);
+    const module = getModule();
+    const calls = instructions.map((pair, idx)=> {
+        const [call, type] = pair;
+        const readCall = _readCall(memAddr + (idx * getPtrSize()), type, module);
+        return ()=> call(readCall());
+    });
+    return ()=> {
+        let i = calls.length - 1;
+        while(i >= 0) {
+            calls[i]();
+            --i;
+        }
+    };
+}
+
+/**
  * read string from pointer
  * @param {number} strPtr 
  * @returns {string}
@@ -108,6 +179,17 @@ function readInstructions(instructions, memAddr) {
 function getString(strPtr) {
     const module = getModule();
     return module.UTF8ToString(module.HEAPU32[strPtr >> 2]);
+}
+
+/**
+ * allocate string pointer
+ * @param {string} str
+ * @returns {number} string ptr 
+ */
+function allocString(str) {
+    if(!str)
+        return 0;
+    return getModule().allocateUTF8(str);
 }
 
 /**
@@ -125,13 +207,43 @@ function memset(ptr, size, value) {
     }
 }
 
+/**
+ * Allocate memory address
+ * @param {number} size
+ * @returns {number} allocated memory address 
+ */
+function malloc(size) {
+    if(size == 0)
+        return 0;
+    return getModule()._malloc(size);
+}
+/**
+ * Free pointer
+ * @param {number} ptr 
+ */
+function free(ptr) {
+    if(ptr != 0)
+        getModule()._free(ptr);
+}
+
+
+const uint = Object.freeze({
+    min : 0,
+    max : Math.pow(2, 32) - 1
+});
 module.exports = {
+    uint,
     sizeof,
     getPtrSize,
     read,
     write,
     writeInstructions,
+    compileWriteInstructions,
     readInstructions,
+    compileReadInstructions,
     getString,
-    memset
+    allocString,
+    memset,
+    malloc,
+    free
 };

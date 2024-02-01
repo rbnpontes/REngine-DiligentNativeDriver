@@ -1,6 +1,7 @@
-const { getPtrSize } = require("./core");
+const { getPtrSize, malloc, free, compileWriteInstructions } = require("./core");
 const { getModule } = require("./native-module");
 const { NativeObject } = require("./native-object");
+const { PipelineState } = require("./pipeline-state");
 const { TextureView } = require("./texture-view");
 
 /**
@@ -30,6 +31,79 @@ function _setRt(rtPtr, rts) {
     });
 }
 
+const $drawArgsPayload = Symbol('__payload');
+class DrawArgs {
+    constructor() {
+        const payload = {
+            numVertices : 0,
+            numInstances : 1,
+            startVertexLocation: 0,
+            firstInstanceLocation: 0,
+            dirty : true,
+            disposed : false,
+            ptr : malloc(4 * getPtrSize()),
+            writeCall : ()=> void(0)
+        };
+
+        const instructions = [
+            [()=> payload.numVertices, 'uint'],
+            [()=> payload.numInstances, 'uint'],
+            [()=> payload.startVertexLocation, 'uint'],
+            [()=> payload.firstInstanceLocation, 'uint'],
+        ];
+        payload.writeCall = compileWriteInstructions(instructions, payload.ptr);
+ 
+        this[$drawArgsPayload] = payload;
+    }
+
+    dispose() {
+        const payload = this[$drawArgsPayload];
+        if(payload.disposed)
+            return;
+        payload.disposed = true;
+        free(payload.ptr);
+    }
+
+    toPtr() {
+        const payload = this[$drawArgsPayload];
+        if(payload.disposed)
+            return 0;
+        if(payload.dirty)
+        {
+            payload.dirty = false;
+            payload.writeCall();
+        }
+        return payload.ptr;
+    }
+
+    get numVertices() { return this[$drawArgsPayload].numVertices; }
+    set numVertices(value) {
+        const payload = this[$drawArgsPayload];
+        payload.numVertices = value;
+        payload.dirty = true;
+    }
+
+    get numInstances() { return this[$drawArgsPayload].numInstances; }
+    set numInstances(value) {
+        const payload = this[$drawArgsPayload];
+        payload.numInstances = value;
+        payload.dirty = true;
+    }
+
+    get startVertexLocation() { return this[$drawArgsPayload].startVertexLocation; }
+    set startVertexLocation(value) {
+        const payload = this[$drawArgsPayload];
+        payload.startVertexLocation = value;
+        payload.dirty = true;
+    }
+
+    get firstInstanceLocation() { return this[$drawArgsPayload].firstInstanceLocation; }
+    set firstInstanceLocation(value) {
+        const payload = this[$drawArgsPayload];
+        payload.firstInstanceLocation = value;
+        payload.dirty = true;
+    }
+}
 class CommandBuffer {
     /**
      * Create command buffer from command buffer ptr
@@ -100,8 +174,15 @@ class CommandBuffer {
     copy(copyInfo) {
         throw new Error('not implemented');
     }
+    /**
+     * 
+     * @param {DrawArgs} drawArgs 
+     */
     draw(drawArgs) {
-        throw new Error('not implemented');
+        if(this.disposed || !drawArgs)
+            return this;
+        getModule()._rengine_cmdbuffer_draw(this.handle, drawArgs.toPtr());
+        return this;
     }
     drawIndexed(drawArgs) {
         throw new Error('not implemented');
@@ -129,8 +210,15 @@ class CommandBuffer {
     setIndexBuffer(buffer, byteOffset) {
         throw new Error('not implemented');
     }
+    /**
+     * 
+     * @param {PipelineState} pipelineState 
+     */
     setPipeline(pipelineState) {
-        throw new Error('not implemented');
+        if(this.disposed || pipelineState.disposed)
+            return this;
+        getModule()._rengine_cmdbuffer_setpipeline(this.handle, pipelineState.handle);
+        return this;
     }
     /**
      * 
@@ -281,6 +369,7 @@ const _nullCommandBuffer = new NullCommandBuffer();
 function getNullCommandBuffer() { return _nullCommandBuffer; }
 
 module.exports = {
+    DrawArgs,
     CommandBuffer,
     getNullCommandBuffer
 };

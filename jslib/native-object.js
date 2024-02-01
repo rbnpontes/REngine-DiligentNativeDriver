@@ -15,18 +15,20 @@ class NativeObject {
         this.handle = handle;
         this.disposed = false;
 
+        const func = _handleRelease.bind(this);
         this._funcPtr = module.addFunction(_handleRelease.bind(this), 'vi');
+        this._func = func; // store function inside object, otherwise gc will collect
         ObjectRegistry.lock(this);
         getModule()._rengine_object_set_release_callback(this.handle, this._funcPtr);
     }
 
     get strongRefs() {
-        if(this.handle)
+        if(!this.handle)
             return 0;
         return getModule()._rengine_object_strongref_count(this.handle);
     }
     get weakRefs() {
-        if(this.handle)
+        if(!this.handle)
             return 0;
         return getModule()._rengine_object_weakref_count(this.handle);
     }
@@ -48,8 +50,6 @@ class NativeObject {
 
         if(handle != 0)
             ObjectRegistry.unlock(handle);
-
-        getModule()._free(this._funcPtr);
     }
 
     onDispose() {}
