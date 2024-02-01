@@ -224,8 +224,11 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 	}
 
 	IRenderDevice* render_device = null;
+#if defined(__EMSCRIPTEN__)
+	IDeviceContext* immediate_ctx = null;
+#else
 	auto device_contexts = new IDeviceContext*[settings->numDeferredCtx + 1];
-
+#endif
 	IEngineFactory* factory = null;
 
 	auto callback = reinterpret_cast<DebugMessageCallbackType>(settings->messageCallback);
@@ -331,7 +334,9 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 	{
 		if (!desc) {
 			result->error = "SwapChain Description is required when Graphics Backend is OpenGL";
+#ifndef __EMSCRIPTEN__
 			delete[] device_contexts;
+#endif
 			return;
 		}
 
@@ -343,17 +348,26 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 		ci.NumDeferredContexts = 0; // Deferred Context on OpenGL is not supported
 		ci.Window = *native_wnd;
 
-		IDeviceContext* immediateCtx;
 		IEngineFactoryOpenGL* engine_factory = GetEngineFactoryOpenGL();
 		engine_factory->SetMessageCallback(callback);
 
+#if defined(__EMSCRIPTEN__)
+		engine_factory->CreateDeviceAndSwapChainGL(
+			ci,
+			&render_device,
+			&immediate_ctx,
+			swapchain_desc,
+			&result->swapChain
+		);
+#else
+		IDeviceContext* immediateCtx;
 		engine_factory->CreateDeviceAndSwapChainGL(
 			ci, 
 			&render_device, 
 			&immediateCtx, swapchain_desc, &result->swapChain);
 
 		device_contexts[0] = immediateCtx;
-
+#endif
 		factory = engine_factory;
 	}
 		break;
@@ -369,7 +383,11 @@ RENGINE void rengine_create_driver(GraphicsDriverSettings* settings, SwapChainDe
 	result->driver = new GraphicsDriver();
 	result->driver->device = render_device;
 	result->driver->factory = factory;
+#if defined(__EMSCRIPTEN__)
+	result->driver->context = immediate_ctx;
+#else
 	result->driver->contexts = device_contexts;
+#endif
 }
 
 #ifndef __EMSCRIPTEN__

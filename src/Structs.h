@@ -110,7 +110,11 @@ namespace REngine
 
 	struct GraphicsDriver {
 		Diligent::IRenderDevice* device;
+#if defined(__EMSCRIPTEN__)
+		Diligent::IDeviceContext* context;
+#else
 		Diligent::IDeviceContext** contexts;
+#endif
 		Diligent::IEngineFactory* factory;
 	};
 
