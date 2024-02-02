@@ -34,13 +34,13 @@ RENGINE void rengine_swapchain_get_desc(Diligent::ISwapChain* swapChain, REngine
 	output->defaultStencilValue = desc.DefaultStencilValue;
 	output->isPrimary = desc.IsPrimary ? 1 : 0;
 }
-
+#ifndef __EMSCRIPTEN__
 RENGINE void rengine_swapchain_present(Diligent::ISwapChain* swapChain, u32 sync) 
 {
 	if(swapChain)
 		swapChain->Present(sync);
 }
-
+#endif
 RENGINE void rengine_swapchain_resize(Diligent::ISwapChain* swapChain, u32 width, u32 height, u32 transform)
 {
 	if (swapChain)

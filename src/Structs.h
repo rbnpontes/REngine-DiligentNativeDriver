@@ -350,25 +350,43 @@ namespace REngine
 
 	struct TextureDescDTO {
 		string* name;
+
+		RENGINE_ALIGN
 		Diligent::RESOURCE_DIMENSION dimension;
+		
 		u32 width;
 		u32 height;
 		u32 arraySizeOrDepth;
+		
+		RENGINE_ALIGN
 		u16 format;
+
 		u32 mipLevels;
 		u32 sampleCount;
+		
+		RENGINE_ALIGN
 		Diligent::BIND_FLAGS bindFlags;
+		
+		RENGINE_ALIGN
 		Diligent::USAGE usage;
+
+		RENGINE_ALIGN
 		Diligent::CPU_ACCESS_FLAGS accessFlags;
+
+		RENGINE_ALIGN
 		Diligent::MISC_TEXTURE_FLAGS textureFlags;
 
+		RENGINE_ALIGN
 		u16 clear_format;
+		
 		float clear_r;
 		float clear_g;
 		float clear_b;
 		float clear_a;
 
 		float clear_depth;
+		
+		RENGINE_ALIGN
 		u8 clear_stencil;
 	};
 
