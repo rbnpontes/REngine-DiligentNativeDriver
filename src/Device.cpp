@@ -7,7 +7,11 @@
 RENGINE void rengine_device_create_buffer(
 	Diligent::IRenderDevice* device,
 	REngine::BufferDescDTO* desc,
+#if defined(__EMSCRIPTEN__)
+	u32 size,
+#else
 	u64 size,
+#endif
 	void* data,
 	REngine::Result* result
 )
@@ -29,7 +33,11 @@ RENGINE void rengine_device_create_buffer(
 	rengine_buffer_fill(desc, &bufferDesc);
 
 	Diligent::BufferData bufferData;
+#if defined(__EMSCRIPTEN__)
+	bufferData.DataSize = static_cast<u64>(size);
+#else
 	bufferData.DataSize = size;
+#endif
 	bufferData.pData = data;
 
 	Diligent::IBuffer* buffer = null;

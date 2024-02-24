@@ -4,7 +4,11 @@
 RENGINE void rengine_device_create_buffer(
 	Diligent::IRenderDevice* device,
 	REngine::BufferDescDTO* desc,
+#if defined(__EMSCRIPTEN__)
+	u32 size,
+#else
 	u64 size,
+#endif
 	void* data,
 	REngine::Result* result
 );
